@@ -1,0 +1,38 @@
+{
+  "name": "protractor-junit-xml-plugin",
+  "version": "0.1.0",
+  "description": "A Protracotor plugin. Report results in junit xml format including requirement ids if available.",
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://scm.sapphirepri.com/arsalan.siddiqui/protractor-junit-xml-plugin.git"
+  },
+  "keywords": [
+    "junit",
+    "protractor-plugin"
+  ],
+  "author": "Arsalan Siddiqui <robotics1@gmail.com>",
+  "dependencies": {
+    "protractor": "^5.4.2",
+    "xml2js-parser": "^1.1.1",
+    "xmlbuilder": "^12.0.0"
+  },
+  "peerDependencies": {
+    "protractor": "5.4.2"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "jasmine-spec-reporter": "^4.2.1",
+    "mocha": "^3.2.0",
+    "xml2js-parser": "^1.1.1",
+    "xmlbuilder": "^12.0.0"
+  },
+  "contributors": []
+}
