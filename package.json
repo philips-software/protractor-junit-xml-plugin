@@ -8,7 +8,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://scm.sapphirepri.com/arsalan.siddiqui/protractor-junit-xml-plugin.git"
+    "url": "https://github.com/philips-software/protractor-junit-xml-plugin.git"
   },
   "keywords": [
     "junit",
@@ -23,6 +23,9 @@
   "peerDependencies": {
     "protractor": "5.4.2"
   },
+  "scripts": {
+    "test": "echo 'no tests yet'"
+  },
   "engines": {
     "node": ">= 10"
   },
@@ -30,9 +33,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "jasmine-spec-reporter": "^4.2.1",
-    "mocha": "^3.2.0",
-    "xml2js-parser": "^1.1.1",
-    "xmlbuilder": "^12.0.0"
+    "mocha": "^3.2.0"
   },
   "contributors": []
 }
