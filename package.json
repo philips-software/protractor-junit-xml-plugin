@@ -1,5 +1,5 @@
 {
-  "name": "protractor-junit-xml-plugin",
+  "name": "@philips-software/protractor-junit-xml-plugin",
   "version": "0.1.0",
   "description": "A Protracotor plugin. Report results in junit xml format including requirement ids if available.",
   "main": "index.js",

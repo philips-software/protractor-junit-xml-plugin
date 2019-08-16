@@ -51,4 +51,4 @@ jobs:
           GITHUB_SHA: ${{ secrets.GITHUB_SHA }}
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
