@@ -43,7 +43,7 @@ jobs:
         with:
           node-version: 12
           registry-url: https://npm.pkg.github.com/
-          scope: '@your-github-username'
+          scope: '@philips-software'
       - run: | 
           npm install -g npm-snapshot
           npm-snapshot $GITHUB_SHA
