@@ -35,5 +35,8 @@
     "jasmine-spec-reporter": "^4.2.1",
     "mocha": "^3.2.0"
   },
-  "contributors": []
+  "contributors": [],
+  "publishConfig": {
+    "registry":"https://npm.pkg.github.com/"
+  }
 }
