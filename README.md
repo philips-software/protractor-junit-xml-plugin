@@ -1,5 +1,5 @@
 # protractor-junit-xml-plugin
-
+[![NPM](https://img.shields.io/npm/v/protractor-junit-xml-plugin.svg)](https://www.npmjs.com/package/protractor-junit-xml-plugin)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://scm.sapphirepri.com/arsalan.siddiqui/protractor-junit-xml-plugin.git)
  
 **Description**: This plugin is a protractor reporter plugin that reports the test results in JUnit XML file so if you are looking for a plugin to export JUnit XML results you are at the right place. 
