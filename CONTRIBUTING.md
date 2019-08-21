@@ -71,7 +71,7 @@ At this point, you should switch back to your master branch and make sure it's
 up to date with `protractor-junit-xml-plugin's` master branch:
 
 ```sh
-git remote add upstream git@scm.sapphirepri.com:arsalan.siddiqui/protractor-junit-xml-plugin.git
+git remote add upstream git@github.com:philips-software/protractor-junit-xml-plugin.git 
 git checkout master
 git pull upstream master
 ```
