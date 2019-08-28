@@ -16,7 +16,7 @@ This plugin is dependent on the node modules "xmlbuilder currently 12.0.1" and "
 The easiest way is to keep `protractor-junit-xml-plugin` as a dependency in your `package.json` pointing to its current repo 
 
 ```bash
-npm install protactor-junit-xml-plugin --save-dev
+npm install protractor-junit-xml-plugin --save-dev
 ```
 
 To update to the latest version
