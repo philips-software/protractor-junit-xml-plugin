@@ -1,6 +1,7 @@
 'use strict'
 const os = require('os'),
       path = require('path'),
+      unqueName = require('uniqueName'),
       fs = require('fs'),
       builder = require('xmlbuilder'),
       parseStringSync = require('xml2js-parser').parseStringSync,
@@ -111,8 +112,12 @@ let findXrayIdAndName = (name, parseXrayId) => {
 JUnitXmlPlugin.prototype.onPrepare = async function () {
   var pluginConfig = this.config;
   currentCapabilities = await browser.getCapabilities();
-  
-  outputFile = resolveCompleteFileName(pluginConfig.filename, pluginConfig.outdir);
+  //use uniqueName
+  if (pluginConfig.uniqueName){
+      outputFile = resolveCompleteFileName(new Date(), pluginConfig.outdir);
+  } else {
+      outputFile = resolveCompleteFileName(pluginConfig.filename, pluginConfig.outdir);
+  }
   // console.log('OUTPUT FILE: ' +outputFile);
 
   suites = Object.create(null);
