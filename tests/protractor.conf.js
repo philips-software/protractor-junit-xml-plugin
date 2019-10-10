@@ -55,8 +55,8 @@ exports.config = {
             filename: 'e2e-tests',
             parseXrayId: true, //default false
             xrayIdOnlyTests: true, //defautl false
-            appendToFile: true, //default false
-            uniqueName: false //default true
+            appendToFile: false, //default false
+            uniqueName: true //default true
         }
     ]
 };
