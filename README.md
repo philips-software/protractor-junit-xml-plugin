@@ -38,6 +38,10 @@ parseXrayId: If set to true it will try to extract Xray Jira id from the test na
 if not specified it defaults to "false"
 
 xrayIdOnlyTests: If set to true, it will only consider the tests that have Xray Jira Id in their name. If not specified it defaults to "false"
+
+uniqueName: If set to true, it will generate a unique name for the filename. Default is true. This can not be true if appendToFile is also true.
+
+appendToFile: If set to true, it will append xml data to the bottom of the file instead of creating a new file or overwriting the file. This can not be true if uniqueName is set to true. Default is false
 ```
 
 ## Usage

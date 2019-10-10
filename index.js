@@ -110,14 +110,21 @@ let findXrayIdAndName = (name, parseXrayId) => {
 
 JUnitXmlPlugin.prototype.onPrepare = async function () {
   var pluginConfig = this.config;
+  if(pluginConfig.uniqueName && pluginConfig.appendToFile) {
+    throw new Error('You can not have a unique name every time as well as appending results to the same file')
+  }
   currentCapabilities = await browser.getCapabilities();
-  
-  outputFile = resolveCompleteFileName(pluginConfig.filename, pluginConfig.outdir);
+  //use uniqueName
+  if (pluginConfig.uniqueName === false){
+    outputFile = resolveCompleteFileName(pluginConfig.filename, pluginConfig.outdir);
+  } else {
+    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir);
+  }
   // console.log('OUTPUT FILE: ' +outputFile);
 
   suites = Object.create(null);
 
-  if (fs.existsSync(outputFile)) {
+  if (fs.existsSync(outputFile) && pluginConfig.appendToFile) {
     console.debug('Found existing outputFile and using it for ' + currentCapabilities.get('browserName'));
 
     xml = builder.create(getJsonInXmlBuilderExpectedFormat(outputFile));
@@ -129,7 +136,6 @@ JUnitXmlPlugin.prototype.onPrepare = async function () {
   failCount = 0;
   initliazeXmlForBrowser();
 };
-
 
 JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
   let pluginConfig = this.config;

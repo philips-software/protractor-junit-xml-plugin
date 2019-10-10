@@ -14,7 +14,7 @@ describe('Given', () => {
         await browser.waitForAngularEnabled(false);
         await browser.get('http://localhost:3020/');
         await browser.sleep(1000);
-        expect(await element(by.cssContainingText('h2','This is not a test app for junit-xml-plugin')).isPresent()).toBeTruthy();
+        expect(await element(by.cssContainingText('h2','This is not a test app for junit-xml-plugin')).isPresent()).toBeFalsy();
     });
 
     it('Passing test with no xrayId', async () => {
