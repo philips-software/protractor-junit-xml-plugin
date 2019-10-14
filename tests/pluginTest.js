@@ -1,4 +1,5 @@
 const { $, browser, by, element, protractor } = require('protractor');
+const fs = require('fs');
 
 describe('Given', () => {
 
@@ -22,6 +23,20 @@ describe('Given', () => {
         await browser.get('http://localhost:3020/');
         await browser.sleep(1000);
         expect(await element(by.cssContainingText('h2','This is node test app for junit-xml-plugin')).isPresent()).toBeTruthy();
+    });
+
+    it("testing unique File created", async () => {
+        await fs.readdirSync('./_test-reports/browser-based-results').forEach(filename =>
+            fs.unlink(directory + '/' + filename, err => {
+                if (err) return logging.log('error', err);
+                logging.log('debug', (filename + ' deleted successfully'));
+            })
+        );
+        await browser.waitForAngularEnabled(false);
+        await browser.get('http://localhost:3020/');
+        await fs.readdirSync('./_test-reports/browser-based-results', (err,files) => {
+           expect(files.length !== 0);
+        });
     });
 
 });

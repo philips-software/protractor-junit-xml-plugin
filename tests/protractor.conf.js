@@ -54,7 +54,7 @@ exports.config = {
             outdir: '_test-reports',
             filename: 'e2e-tests',
             parseXrayId: true, //default false
-            xrayIdOnlyTests: true, //defautl false
+            xrayIdOnlyTests: false, //defautl false
             appendToFile: false, //default false
             uniqueName: true //default true
         }
