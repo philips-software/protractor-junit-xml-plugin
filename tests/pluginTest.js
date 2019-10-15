@@ -1,5 +1,6 @@
 const { $, browser, by, element, protractor } = require('protractor');
 const fs = require('fs');
+const rimraf = require('rimraf');
 
 describe('Given', () => {
 
@@ -26,16 +27,13 @@ describe('Given', () => {
     });
 
     it("testing unique File created", async () => {
-        await fs.readdirSync('./_test-reports/browser-based-results').forEach(filename =>
-            fs.unlink(directory + '/' + filename, err => {
-                if (err) return logging.log('error', err);
-                logging.log('debug', (filename + ' deleted successfully'));
-            })
-        );
+        rimraf('./_test-reports/browser-based-results/*', function() {
+           console.log('done');
+        });
         await browser.waitForAngularEnabled(false);
         await browser.get('http://localhost:3020/');
         await fs.readdirSync('./_test-reports/browser-based-results', (err,files) => {
-           expect(files.length !== 0);
+           expect(files.length === 1);
         });
     });
 
