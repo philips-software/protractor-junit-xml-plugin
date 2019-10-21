@@ -3,6 +3,16 @@ const { SpecReporter } = require('jasmine-spec-reporter');
 exports.config = {
     // seleniumAddress: 'http://127.0.0.1:4444/wd/hub',
 
+    params: {
+        login: {
+            username: 'default',
+            password: 'default'
+        },
+        env: {
+            environment: 'default'
+        }
+    },
+
     allScriptsTimeout: 110000,
     specs: [
         './pluginTest.js'
