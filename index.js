@@ -7,6 +7,7 @@ const os = require('os'),
       JUNITXMLPLUGIN = 'JUnitXrayPlugin: ';
 
 let outputFile,
+    OUTDIR_FINAL,
     xml,
     suites,
     testCount, 
@@ -30,8 +31,14 @@ let initliazeXmlForBrowser = async function () {
   });
 };
 
-let resolveCompleteFileName = (givenFileName, givenDir) => {
-  const OUTDIR_FINAL = (givenDir || '_test-reports/e2e-test-results') + '/browser-based-results'
+let resolveCompleteFileName = (givenFileName, givenDir, uniqueFolder) => {
+  // let OUTDIR_FINAL = ''
+  if(uniqueFolder){ 
+    const timeTillMinuteStamp = (new Date()).toISOString().substr(0, 16).replace(':','_');
+    OUTDIR_FINAL = (givenDir || '_test-reports/e2e-test-results') + '/browser-based-results_' + timeTillMinuteStamp;
+  } else {
+    OUTDIR_FINAL = (givenDir || '_test-reports/e2e-test-results') + '/browser-based-results_';
+  }
   const FILE_NAME = currentCapabilities.get('browserName') + '-' + (givenFileName || 'test-results.xml')
 
   if (!fs.existsSync(OUTDIR_FINAL)) {
@@ -108,17 +115,30 @@ let findXrayIdAndName = (name, parseXrayId) => {
   return finalObj;
 }
 
+JUnitXmlPlugin.prototype.setup = async function () {
+  console.log('Coming in setup');
+  //console.log('protractor obj: ' + protractor);
+  console.log('Random folder name: ' + browser.params.randomFolderName);
+  
+  // if (protractor.arsal1) {
+  //   console.log('var1 already set');
+  // } else {
+  //   console.log('defining var1');
+  //   protractor.arsal1 = 'Chrome';
+  // }
+}
+
 JUnitXmlPlugin.prototype.onPrepare = async function () {
   var pluginConfig = this.config;
-  if(pluginConfig.uniqueName && pluginConfig.appendToFile) {
-    throw new Error('You can not have a unique name every time as well as appending results to the same file')
+  if(pluginConfig.uniqueName && pluginConfig.appendToFile || pluginConfig.uniqueFolder && pluginConfig.appendToFile) {
+    throw new Error('You can not have a unique name or folder every time as well as appending results to the same file')
   }
   currentCapabilities = await browser.getCapabilities();
   //use uniqueName
   if (pluginConfig.uniqueName === false){
-    outputFile = resolveCompleteFileName(pluginConfig.filename, pluginConfig.outdir);
+    outputFile = resolveCompleteFileName(pluginConfig.filename, pluginConfig.outdir, pluginConfig.uniqueFolder);
   } else {
-    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir);
+    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolder);
   }
   // console.log('OUTPUT FILE: ' +outputFile);
 
@@ -168,6 +188,25 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
 
 JUnitXmlPlugin.prototype.teardown = async function () {
   console.log(JUNITXMLPLUGIN + 'inside Teardown')
+  // const vcsVersion = await browser.executeScript('return sapphireWebAppConfig.appVersion');
+  // console.log('VCSVersion: ' + vcsVersion);
+// Setting global params in protractor
+  console.log('Start - metaDataFile: ' + browser.params.metadataFile.buildNumber + " " + browser.params.metadataFile.summary);
+  if (browser.params.metadataFile.buildNumber === 'Default'){
+    // browser.params.metaDataFile = true;
+    console.warn('No metadata passed in');
+  } else {
+    let metaDataContents = '{buildNumber: ' + browser.params.metadataFile.buildNumber + '},\n{summary + ' + browser.params.metadataFile.summary + '}' 
+    fs.writeFile(OUTDIR_FINAL + "/Metadata.properties", metaDataContents, function (err) {
+      if (err) {
+        console.warn('Cannot write JUnit xml\n\t' + err.message);
+      } else {
+        console.debug('JUnit results written to "%s".', outputFile);
+      }});
+    //make metadata file
+    //add metadata contents to file
+  }
+
   let suite = suites[getBrowserId()];
 
   suite.att('tests', testCount);
