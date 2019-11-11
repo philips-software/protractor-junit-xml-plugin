@@ -115,19 +115,6 @@ let findXrayIdAndName = (name, parseXrayId) => {
   return finalObj;
 }
 
-JUnitXmlPlugin.prototype.setup = async function () {
-  console.log('Coming in setup');
-  //console.log('protractor obj: ' + protractor);
-  console.log('Random folder name: ' + browser.params.randomFolderName);
-  
-  // if (protractor.arsal1) {
-  //   console.log('var1 already set');
-  // } else {
-  //   console.log('defining var1');
-  //   protractor.arsal1 = 'Chrome';
-  // }
-}
-
 JUnitXmlPlugin.prototype.onPrepare = async function () {
   var pluginConfig = this.config;
   if(pluginConfig.uniqueName && pluginConfig.appendToFile || pluginConfig.uniqueFolder && pluginConfig.appendToFile) {
@@ -187,24 +174,16 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
 };
 
 JUnitXmlPlugin.prototype.teardown = async function () {
-  console.log(JUNITXMLPLUGIN + 'inside Teardown')
-  // const vcsVersion = await browser.executeScript('return sapphireWebAppConfig.appVersion');
-  // console.log('VCSVersion: ' + vcsVersion);
-// Setting global params in protractor
-  console.log('Start - metaDataFile: ' + browser.params.metadataFile.buildNumber + " " + browser.params.metadataFile.summary);
   if (browser.params.metadataFile.buildNumber === 'Default'){
-    // browser.params.metaDataFile = true;
     console.warn('No metadata passed in');
   } else {
     let metaDataContents = '{buildNumber: ' + browser.params.metadataFile.buildNumber + '},\n{summary + ' + browser.params.metadataFile.summary + '}' 
     fs.writeFile(OUTDIR_FINAL + "/Metadata.properties", metaDataContents, function (err) {
       if (err) {
-        console.warn('Cannot write JUnit xml\n\t' + err.message);
+        console.warn('Cannot write Metadata file xml\n\t' + err.message);
       } else {
-        console.debug('JUnit results written to "%s".', outputFile);
+        console.debug('Metadata file results written to Metadata.properties');
       }});
-    //make metadata file
-    //add metadata contents to file
   }
 
   let suite = suites[getBrowserId()];

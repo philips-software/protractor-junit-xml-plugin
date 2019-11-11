@@ -45,11 +45,32 @@ describe('Given', () => {
         browser.waitForAngularEnabled(false);
         browser.get('http://localhost:3020/');
         browser.sleep(5000);
-        fs.readdirSync('./_test-reports/browser-based-results').forEach(fileName => {
-            let timestamp = fileName.match(/\d+/);
-            expect(new Date(timestamp*1000).getFullYear()).toEqual(new Date().getFullYear());
-            expect(new Date(timestamp*1000).getDate()).toEqual(new Date().getDate());
-            expect(new Date(timestamp*1000).getHours()).toEqual(new Date().getHours());
+        fs.readdirSync('./_test-reports/').forEach(folder => {
+            console.error(folder)
+            fs.readdirSync('./_test-reports/' + folder).forEach(fileName => {
+                if(fileName != 'Metadata.properties'){
+                    let timestamp = fileName.match(/\d+/);
+                    expect(new Date(timestamp*1000).getFullYear()).toEqual(new Date().getFullYear());
+                    expect(new Date(timestamp*1000).getDate()).toEqual(new Date().getDate());
+                    expect(new Date(timestamp*1000).getHours()).toEqual(new Date().getHours());
+                }
+            })
+        });
+    });
+
+    it("testing unique Folder name created", function ()  {
+        rimraf('./_test-reports/browser-based-results/*', function() {
+            console.log('done');
+        });
+        browser.waitForAngularEnabled(false);
+        browser.get('http://localhost:3020/');
+        browser.sleep(5000);
+        fs.readdirSync('./_test-reports/').forEach(folder => {
+            console.error(folder)
+            let timestamp = folder.match(/\d+/);
+            expect(new Date().getFullYear()).toEqual(new Date().getFullYear());
+            expect(new Date().getDate()).toEqual(new Date().getDate());
+            expect(new Date().getHours()).toEqual(new Date().getHours());
         });
     });
 });
