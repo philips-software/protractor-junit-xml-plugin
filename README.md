@@ -41,7 +41,19 @@ xrayIdOnlyTests: If set to true, it will only consider the tests that have Xray 
 
 uniqueName: If set to true, it will generate a unique name for the filename. Default is true. This can not be true if appendToFile is also true.
 
-appendToFile: If set to true, it will append xml data to the bottom of the file instead of creating a new file or overwriting the file. This can not be true if uniqueName is set to true. Default is false
+appendToFile: If set to true, it will append xml data to the bottom of the file instead of creating a new file or overwriting the file. This can not be true if uniqueName or uniqueFolder is set to true. Default is false
+
+uniqueFolder: If set to true, it will create a new directory for each time the test suite is run. 
+
+```
+
+The following are the configureable params
+```
+
+metadataFile.buildNumber: This is an optional value that can be set. If set it will create a Metadata.properties file in the test directory that will contain this and the summary value.
+
+metadataFile.summary: This is an optional value that can be set. If buildNumber is set, this value is placed in the created Metadata.properties file.
+
 ```
 
 ## Usage

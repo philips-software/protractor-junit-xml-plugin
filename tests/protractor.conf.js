@@ -6,7 +6,7 @@ exports.config = {
     params: {
         metadataFile: {
             buildNumber: 'Default',
-            summary: 'Protractor Conf Tests'
+            summary: 'Default summary'
         }
     },
 
@@ -64,7 +64,7 @@ exports.config = {
             xrayIdOnly: false, //default false
             appendToFile: false, //default false
             uniqueName: true, //default true
-            uniqueFolder: true // default false
+            uniqueFolder: false // default false
         }
     ]
 };
