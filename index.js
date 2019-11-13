@@ -174,17 +174,21 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
 };
 
 JUnitXmlPlugin.prototype.teardown = async function () {
-  if (browser.params.metadataFile.buildNumber === 'Default'){
-    console.warn('No metadata passed in');
-  } else {
-    let metaDataContents = '{buildNumber: ' + browser.params.metadataFile.buildNumber + '},\n{summary + ' + browser.params.metadataFile.summary + '}' 
-    fs.writeFile(OUTDIR_FINAL + "/Metadata.properties", metaDataContents, function (err) {
-      if (err) {
-        console.warn('Cannot write Metadata file xml\n\t' + err.message);
-      } else {
-        console.debug('Metadata file results written to Metadata.properties');
-      }});
+  let pluginConfig = this.config;
+  let vcsVersion = ' ';
+  if(pluginConfig.useSapphireVCSBuildNumber) {
+    vcsVersion = await browser.executeScript('return sapphireWebAppConfig.appVersion');
+    console.log('VCSVersion: ' + vcsVersion)
+  } else if (pluginConfig.buildNumber !== 'Default') {
+    vcsVersion = plugin.buildNumber;
   }
+  let metaDataContents = '{buildNumber: ' + vcsVersion + '},\n{summary + ' + browser.params.metadataFile.summary + '}' 
+  fs.writeFile(OUTDIR_FINAL + "/Metadata.properties", metaDataContents, function (err) {
+  if (err) {
+        console.warn('Cannot write Metadata file xml\n\t' + err.message);
+  } else {
+        console.debug('Metadata file results written to Metadata.properties');
+  }});
 
   let suite = suites[getBrowserId()];
 

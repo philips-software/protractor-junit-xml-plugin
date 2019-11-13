@@ -19,7 +19,7 @@ exports.config = {
         browserName: 'chrome',
         chromeOptions: {
             // "args": ["incognito", "--window-size=1920,1080", "start-maximized", "--test-type=browser"],
-            args: ['--headless', 'disable-extensions'],
+            args: ['disable-extensions'],
             // args: ['--headless', 'disable-extensions'],
             prefs: {
                 download: {
@@ -64,7 +64,9 @@ exports.config = {
             xrayIdOnly: false, //default false
             appendToFile: false, //default false
             uniqueName: true, //default true
-            uniqueFolder: false // default false
+            uniqueFolder: true, // default false
+            useSapphireVCSBuildNumber: true
+            //use sapphireVCSBuildNumber //default false
         }
     ]
 };
