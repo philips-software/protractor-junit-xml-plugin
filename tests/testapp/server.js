@@ -1,8 +1,10 @@
 const express = require('express')
 const app = express()
 
+app.use('/', express.static('app', {index: "index.html"}));
+
 app.get('/', function (req, res) {
-  res.send('<h2>This is node test app for junit-xml-plugin</h2>');
+  res.sendFile('index.html', { root: '.' } );
 })
 
 app.listen(3020, function () {

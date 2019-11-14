@@ -3,6 +3,13 @@ const { SpecReporter } = require('jasmine-spec-reporter');
 exports.config = {
     // seleniumAddress: 'http://127.0.0.1:4444/wd/hub',
 
+    params: {
+        metadataFile: {
+            buildNumber: 'Default',
+            summary: 'Default summary'
+        }
+    },
+
     allScriptsTimeout: 110000,
     specs: [
         './pluginTest.js'
@@ -37,14 +44,15 @@ exports.config = {
     //     },
     //     { browserName: 'firefox' }
     // ],
+    timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':','_'),
     directConnect: true,
     baseUrl: 'http://localhost:4200/',
     framework: 'jasmine',
-    jasmineNodeOpts: {
+    jasmineNodeOpts: { 
         showColors: true,
         defaultTimeoutInterval: 120000,
         print: function() {}
-    },
+    }, 
     OnPrepare() {
         jasmine.getEnv().addReporter,(new SpecReporter({ spec: { displayStacktrace: true } }));
     },
@@ -54,9 +62,12 @@ exports.config = {
             outdir: '_test-reports',
             filename: 'e2e-tests',
             parseXrayId: true, //default false
-            xrayIdOnly: false, //defautl false
+            xrayIdOnly: false, //default false
             appendToFile: false, //default false
-            uniqueName: true //default true
+            uniqueName: true, //default true
+            uniqueFolder: true, // default false
+            useSapphireVCSBuildNumber: true
+            //use sapphireVCSBuildNumber //default false
         }
     ]
 };
