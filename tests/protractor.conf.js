@@ -44,6 +44,7 @@ exports.config = {
     //     },
     //     { browserName: 'firefox' }
     // ],
+    timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':','_'),
     directConnect: true,
     baseUrl: 'http://localhost:4200/',
     framework: 'jasmine',

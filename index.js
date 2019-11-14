@@ -34,10 +34,9 @@ let initliazeXmlForBrowser = async function () {
 let resolveCompleteFileName = (givenFileName, givenDir, uniqueFolder) => {
   // let OUTDIR_FINAL = ''
   if(uniqueFolder){ 
-    const timeTillMinuteStamp = (new Date()).toISOString().substr(0, 16).replace(':','_');
-    OUTDIR_FINAL = (givenDir || '_test-reports/e2e-test-results') + '/browser-based-results_' + timeTillMinuteStamp;
+    OUTDIR_FINAL = (givenDir || '_test-reports/e2e-test-results') + '/browser-based-results_' + browser.timeTillMinuteStamp;
   } else {
-    OUTDIR_FINAL = (givenDir || '_test-reports/e2e-test-results') + '/browser-based-results_';
+    OUTDIR_FINAL = (givenDir || '_test-reports/e2e-test-results') + '/browser-based-results';
   }
   const FILE_NAME = currentCapabilities.get('browserName') + '-' + (givenFileName || 'test-results.xml')
 
