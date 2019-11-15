@@ -175,20 +175,20 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
 JUnitXmlPlugin.prototype.teardown = async function () {
   let pluginConfig = this.config;
   let vcsVersion = ' ';
+  let summary = 'Protractor UI e2e tests against ' + browser.baseUrl;
+  console.debug('summary: ' + summary);
   if(pluginConfig.useSapphireVCSBuildNumber) {
     vcsVersion = await browser.executeScript('return sapphireWebAppConfig.appVersion');
     console.log('VCSVersion: ' + vcsVersion)
-  } else if (pluginConfig.buildNumber !== 'Default') {
-    vcsVersion = plugin.buildNumber;
   }
-  let metaDataContents = '{buildNumber: ' + vcsVersion + '},\n{summary + ' + browser.params.metadataFile.summary + '}' 
-  fs.writeFile(OUTDIR_FINAL + "/Metadata.properties", metaDataContents, function (err) {
+  let metaDataContents = '{buildNumber: ' + vcsVersion + '},\n{summary + ' + summary + '}' 
+  fs.writeFileSync(OUTDIR_FINAL + "/Metadata.properties", metaDataContents, function (err) {
   if (err) {
         console.warn('Cannot write Metadata file xml\n\t' + err.message);
   } else {
         console.debug('Metadata file results written to Metadata.properties');
   }});
-
+ 
   let suite = suites[getBrowserId()];
 
   suite.att('tests', testCount);
