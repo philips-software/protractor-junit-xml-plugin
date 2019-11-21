@@ -31,10 +31,10 @@ let initliazeXmlForBrowser = async function () {
   });
 };
 
-let resolveCompleteFileName = (givenFileName, givenDir, uniqueFolder) => {
+let resolveCompleteFileName = (givenFileName, givenDir, uniqueFolder, givenTimestamp) => {
   // let OUTDIR_FINAL = ''
   if(uniqueFolder){ 
-    OUTDIR_FINAL = (givenDir || '_test-reports/e2e-test-results') + '/browser-based-results_' + browser.timeTillMinuteStamp;
+    OUTDIR_FINAL = (givenDir || '_test-reports/e2e-test-results') + '/browser-based-results_' + givenTimestamp;
   } else {
     OUTDIR_FINAL = (givenDir || '_test-reports/e2e-test-results') + '/browser-based-results';
   }
@@ -122,9 +122,9 @@ JUnitXmlPlugin.prototype.onPrepare = async function () {
   currentCapabilities = await browser.getCapabilities();
   //use uniqueName
   if (pluginConfig.uniqueName === false){
-    outputFile = resolveCompleteFileName(pluginConfig.filename, pluginConfig.outdir, pluginConfig.uniqueFolder);
+    outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
   } else {
-    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolder);
+    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
   }
   // console.log('OUTPUT FILE: ' +outputFile);
 
@@ -181,13 +181,16 @@ JUnitXmlPlugin.prototype.teardown = async function () {
     vcsVersion = await browser.executeScript('return sapphireWebAppConfig.appVersion');
     console.log('VCSVersion: ' + vcsVersion)
   }
-  let metaDataContents = '{buildNumber: ' + vcsVersion + '},\n{summary + ' + summary + '}' 
-  fs.writeFileSync(OUTDIR_FINAL + "/Metadata.properties", metaDataContents, function (err) {
+  let metaDataContents = {
+    buildNumber: vcsVersion,
+    summary: summary
+  }
+  fs.writeFileSync(OUTDIR_FINAL + "/metadata.json", JSON.stringify(metaDataContents), function (err) {
   if (err) {
-        console.warn('Cannot write Metadata file xml\n\t' + err.message);
+        console.warn('Cannot write metadata file\n\t' + err.message);
   } else {
-        console.debug('Metadata file results written to Metadata.properties');
-  }});
+        console.debug('Metadata file results written to metadata.json');
+  }});ß
  
   let suite = suites[getBrowserId()];
 
