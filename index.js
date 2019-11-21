@@ -190,7 +190,7 @@ JUnitXmlPlugin.prototype.teardown = async function () {
         console.warn('Cannot write metadata file\n\t' + err.message);
   } else {
         console.debug('Metadata file results written to metadata.json');
-  }});ß
+  }});
  
   let suite = suites[getBrowserId()];
 
