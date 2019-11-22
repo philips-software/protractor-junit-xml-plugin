@@ -66,8 +66,7 @@ exports.config = {
             appendToFile: false, //default false
             uniqueName: true, //default true
             uniqueFolder: true, // default false
-            useSapphireVCSBuildNumber: true
-            //use sapphireVCSBuildNumber //default false
+            useSapphireVCSBuildNumber: true //default false 
         }
     ]
 };
