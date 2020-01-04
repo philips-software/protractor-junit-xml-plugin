@@ -1,5 +1,5 @@
 'use strict'
-const os = require('os'),
+var os = require('os'),
       path = require('path'),
       fs = require('fs'),
       builder = require('xmlbuilder'),
@@ -41,7 +41,7 @@ let resolveCompleteFileName = (givenFileName, givenDir, uniqueFolder, givenTimes
   const FILE_NAME = currentCapabilities.get('browserName') + '-' + (givenFileName || 'test-results.xml')
 
   if (!fs.existsSync(OUTDIR_FINAL)) {
-    console.info('CREATING DIR + ' + OUTDIR_FINAL);
+    console.info(JUNITXMLPLUGIN + 'CREATING DIR + ' + OUTDIR_FINAL);
     fs.mkdir(OUTDIR_FINAL, { recursive: true }, function(){});
   }
 
