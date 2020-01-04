@@ -12,15 +12,15 @@ exports.config = {
 
     allScriptsTimeout: 110000,
     specs: [
-        './pluginTest.js'
+        './e2eTest.js'
     ],
     SELENIUM_PROMISE_MANAGER: false,
     capabilities: {
         browserName: 'chrome',
         chromeOptions: {
             // "args": ["incognito", "--window-size=1920,1080", "start-maximized", "--test-type=browser"],
-            args: ['disable-extensions'],
-            // args: ['--headless', 'disable-extensions'],
+            // args: ['disable-extensions'],
+            args: ['--headless', 'disable-extensions'],
             prefs: {
                 download: {
                     prompt_for_download: false
