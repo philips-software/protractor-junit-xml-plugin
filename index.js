@@ -41,7 +41,8 @@ let resolveCompleteFileName = (givenFileName, givenDir, uniqueFolder, givenTimes
   const FILE_NAME = currentCapabilities.get('browserName') + '-' + (givenFileName || 'test-results.xml')
 
   if (!fs.existsSync(OUTDIR_FINAL)) {
-    fs.mkdirSync(OUTDIR_FINAL, { recursive: true });
+    console.info('CREATING DIR + ' + OUTDIR_FINAL);
+    fs.mkdir(OUTDIR_FINAL, { recursive: true }, function(){});
   }
 
   return path.resolve(OUTDIR_FINAL, FILE_NAME);
@@ -176,7 +177,14 @@ JUnitXmlPlugin.prototype.teardown = async function () {
   let pluginConfig = this.config;
   let vcsVersion = ' ';
   let summary = 'Protractor UI e2e tests against ' + browser.baseUrl;
-  console.debug('summary: ' + summary);
+  // console.debug('summary: ' + summary);
+ 
+  if (pluginConfig.uniqueName === false){
+    outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
+  } else {
+    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
+  }
+
   if(pluginConfig.useSapphireVCSBuildNumber) {
     vcsVersion = await browser.executeScript('return sapphireWebAppConfig.appVersion');
     console.log('VCSVersion: ' + vcsVersion)
