@@ -44,9 +44,8 @@ exports.config = {
     //     },
     //     { browserName: 'firefox' }
     // ],
-    timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':','_'),
     directConnect: true,
-    baseUrl: 'http://localhost:4200/',
+    baseUrl: 'http://localhost:3020/',
     framework: 'jasmine',
     jasmineNodeOpts: { 
         showColors: true,
@@ -62,6 +61,8 @@ exports.config = {
             outdir: '_test-reports',
             filename: 'e2e-tests',
             parseXrayId: true, //default false
+            projectKey: 'CARE',
+            timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':','_'),
             xrayIdOnly: false, //default false
             appendToFile: false, //default false
             uniqueName: true, //default true

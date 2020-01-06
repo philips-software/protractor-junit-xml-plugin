@@ -1,8 +1,17 @@
-const { $, browser, by, element, protractor } = require('protractor');
+const { browser, by, element } = require('protractor');
 const fs = require('fs');
 const rimraf = require('rimraf');
 
-describe('Given', () => {
+describe('', () => {
+    beforeAll(() => {
+        rimraf('./_test-reports/browser-based-results*', (err) => {
+            if(err) {
+                console.error('Deleting dir failed: ' + err);
+            } else {
+                console.log('Successfully deleted all the dir');
+            }
+        })
+    });
 
     it(':XRAY-1234: Passing test with xrayId', async () => {
         debugger;
@@ -26,51 +35,17 @@ describe('Given', () => {
         expect(await element(by.cssContainingText('h2','This is node test app for junit-xml-plugin')).isPresent()).toBeTruthy();
     });
 
-    it("testing unique File created", function () {
-        rimraf('./_test-reports/browser-based-results/*', function() {
-           console.log('done');
-        });
-        browser.waitForAngularEnabled(false);
-        browser.get('http://localhost:3020/');
-        browser.sleep(5000);
-        fs.readdirSync('./_test-reports/browser-based-results', (err,files) => {
-            expect(files.length).toEqual(1).toBeTrue();
-        });
-    });
-
-    it("testing unique File name created", function ()  {
-        rimraf('./_test-reports/browser-based-results/*', function() {
-            console.log('done');
-        });
-        browser.waitForAngularEnabled(false);
-        browser.get('http://localhost:3020/');
-        browser.sleep(5000);
-        fs.readdirSync('./_test-reports/').forEach(folder => {
-            console.error(folder)
-            fs.readdirSync('./_test-reports/' + folder).forEach(fileName => {
-                if(fileName != 'Metadata.properties'){
-                    let timestamp = fileName.match(/\d+/);
-                    expect(new Date(timestamp*1000).getFullYear()).toEqual(new Date().getFullYear());
-                    expect(new Date(timestamp*1000).getDate()).toEqual(new Date().getDate());
-                    expect(new Date(timestamp*1000).getHours()).toEqual(new Date().getHours());
-                }
-            })
-        });
-    });
-
     it("testing unique Folder name created", function ()  {
-        rimraf('./_test-reports/browser-based-results/*', function() {
-            console.log('done');
-        });
         browser.waitForAngularEnabled(false);
         browser.get('http://localhost:3020/');
         browser.sleep(5000);
         fs.readdirSync('./_test-reports/').forEach(folder => {
-            console.error(folder)
-            let timestamp = folder.match(/\d+/);
+            console.log(folder)
             expect(new Date().getFullYear()).toEqual(new Date().getFullYear());
             expect(new Date().getDate()).toEqual(new Date().getDate());
             expect(new Date().getHours()).toEqual(new Date().getHours());
         });
     });
+
+
 });
