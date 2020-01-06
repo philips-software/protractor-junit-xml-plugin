@@ -8,34 +8,28 @@ const chai = require('chai');
 let rewire = require('rewire');
 
 let protractorJunitXmlPlugin,
-    fakeBuilder = {},    
+    fakeBuilder = {},
     fakeFs = {},
     fakeOs = {},
     fakePath = {},
     fakeParseStringSync = {};
 
-describe('plugin test', function(){
-    before(()=> {
+describe('plugin test', function () {
+    before(() => {
         protractorJunitXmlPlugin = rewire('../index.js');
         protractorJunitXmlPlugin.__set__({
-            "fs": fakeFs,
-            "os": fakeOs,
-            "path": fakePath,
-            "builder": fakeBuilder,
-            parseStringSync: fakeParseStringSync 
+            fs: fakeFs,
+            os: fakeOs,
+            path: fakePath,
+            builder: fakeBuilder,
+            parseStringSync: fakeParseStringSync
         });
-        
-        // protractorJunitXmlPlugin.__set__({
-        //     os: fakeOs,
-        //     fs: fakeFs,
-        //     path: fakePath,
-        //     xmlbuilder: fakeBuilder,
-        //     "xml2js-parser": fakeXmlToJsParser 
-        // });
-        
+        protractorJunitXmlPlugin.__set__('pluginConfig', {
+            uniqueName: true
+        })
     });
 
-    it('test the browserId', function(){
+    it('test the config option', function () {
         debugger;
         console.log('here');
         console.log(protractorJunitXmlPlugin);

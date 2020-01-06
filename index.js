@@ -1,5 +1,5 @@
 'use strict'
-var os = require('os'),
+let os = require('os'),
       path = require('path'),
       fs = require('fs'),
       builder = require('xmlbuilder'),
@@ -8,6 +8,7 @@ var os = require('os'),
 
 let outputFile,
     OUTDIR_FINAL,
+    pluginConfig,
     xml,
     suites,
     testCount, 
@@ -116,7 +117,10 @@ let findXrayIdAndName = (name, parseXrayId) => {
 }
 
 JUnitXmlPlugin.prototype.onPrepare = async function () {
-  var pluginConfig = this.config;
+  
+  if (!pluginConfig) {
+    pluginConfig = this.config;
+  } 
   if(pluginConfig.uniqueName && pluginConfig.appendToFile || pluginConfig.uniqueFolder && pluginConfig.appendToFile) {
     throw new Error('You can not have a unique name or folder every time as well as appending results to the same file')
   }
