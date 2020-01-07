@@ -1,24 +1,28 @@
-const chai = require('chai');
+let chai = require('chai');
+let expect = chai.expect;
+const assert = chai.assert;
+// chai.use(require('sinon-chai'))
+
+
 'use strict'
 
-// var chai = require('chai')
-// var expect = require('chai').expect
-// var sinon = require('sinon')
+let sinon = require('sinon')
+
 // var proxyquire = require('proxyquire');
 let rewire = require('rewire');
 
 let protractorJunitXmlPlugin,
     fakeBuilder = {},
-    fakeFs = {},
     fakeOs = {},
-    fakePath = {},
+    fakePath = {
+        resolve: () => '/fake-path'
+    },
     fakeParseStringSync = {};
 
 describe('plugin test', function () {
     before(() => {
         protractorJunitXmlPlugin = rewire('../index.js');
         protractorJunitXmlPlugin.__set__({
-            fs: fakeFs,
             os: fakeOs,
             path: fakePath,
             builder: fakeBuilder,
@@ -29,12 +33,84 @@ describe('plugin test', function () {
         })
     });
 
-    it('test the config option', function () {
-        debugger;
-        console.log('here');
-        console.log(protractorJunitXmlPlugin);
-        // let ab = JUnitXrayPlugin.getBrowserId
-        let ab = new protractorJunitXmlPlugin.JUnitXrayPlugin()
-        console.timeLog(ab);
+    it('if config captureCOContextVar is true then add sapphireWebAppConfig context fields in metadata file', async function () {
+        protractorJunitXmlPlugin.__set__('pluginConfig', {
+            path: '../', //path for protractor plugin
+            outdir: '_test-reports',
+            filename: 'e2e-tests',
+            jiraProjectKey: 'CARE',
+            timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':', '_'),
+            uniqueName: true, //default true
+            uniqueFolder: true, // default false
+            captureCOContextVar: true //default false 
+        });
+        protractorJunitXmlPlugin.__set__('currentBrowser', {
+            baseUrl: 'https://unit-test-fake-url.com',
+            executeScript: async function (input) {
+                console.log('fake executeScript is called with input: ' + input)
+                return {
+                    environment: "production",
+                    appName: "ClientCareOrchestrator",
+                    appVersion: "1.28.0-prerelease.46",
+                    'pr.care-orchestrator': "1.28.0-prerelease.42",
+                    isNewRelicEnabled: false,
+                    careOrchestratorVersion: "0.0.0",
+                    careOrchestratorBuildNumber: "11493",
+                    careOrchestratorLastBuildDate: "NOT_SET",
+                    TOGGLES_STATIC_TOGGLE_RWD: true,
+                    TOGGLES_STATIC_TOGGLE_F2482_Business_Reports: true,
+                    TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY: true,
+                    TOGGLES_STATIC_TOGGLE_F888: true,
+                    gatewayUrl: "http://nti-sapphiregateway-v1-server.cloud.pcftest.com:80"
+                }
+            }
+
+        });
+        let fakeCapabilities = {
+            get: function () {
+                console.log('Coming in fakeCapabilities.get()');
+                return 'first';
+            }
+        }
+        protractorJunitXmlPlugin.__set__({
+            currCapabilities: fakeCapabilities,
+            suites: {
+                first: {
+                    att: (input1, input2) => {
+                        console.log('suite.att() called with input: ' + input1 + ', ' + input2);
+                    }
+                }
+            },
+            xml: {
+                end: () => '<fake-xml></fake-xml>'
+            }
+        });
+
+        const fakeFs = {
+            existsSync: () => {
+                return true;
+            },
+            writeFile: function () {
+                console.log('Coming in fake writeFile()');
+            },
+            writeFileSync: sinon.spy()
+        };
+
+        protractorJunitXmlPlugin.__set__('fs', fakeFs);
+
+        await protractorJunitXmlPlugin.teardown();
+
+        console.log('if writeFileSync spy is called: ' + fakeFs.writeFileSync.called);
+        const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
+        expect(metadata).to.exist;
+        expect(metadata).to.have.all.keys(['jiraProjectKey', 'envProperties']);
+        const envProperties = metadata.envProperties;
+        expect(envProperties).to.include.any.keys([
+            'environment', 'appName', 'appVersion', 'pr.care-orchestrator',
+            'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
+            'careOrchestratorLastBuildDate', 'TOGGLES_STATIC_TOGGLE_RWD',
+            'TOGGLES_STATIC_TOGGLE_F2482_Business_Reports', 'TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY',
+            'gatewayUrl'
+        ]);
     })
 });
