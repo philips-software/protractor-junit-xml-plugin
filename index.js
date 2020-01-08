@@ -116,7 +116,23 @@ let findXrayIdAndName = (name, parseXrayId) => {
 
   return finalObj;
 }
-
+const addSapphireWebAppConfigProperties = async (envProperties) => {
+  let sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig.appVersion');
+  console.debug('sapphireWebAppConfig: ' + JSON.stringify(sapphireWebAppConfig))
+  const requiredKeys = ['environment', 'appName', 'appVersion', 
+  'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
+  'careOrchestratorLastBuildDate', 'gatewayUrl']
+  
+  requiredKeys.forEach((item) => (envProperties[item] = sapphireWebAppConfig[item]));
+  if(sapphireWebAppConfig.packagedDeps) {
+    envProperties.pr_care_orchestrator_version = sapphireWebAppConfig.packagedDeps['pr.care-orchestrator'];
+  }
+  // Get toggles and add them in metadata 
+  const TOGGLE_PREFIX = 'TOGGLES_'
+  for(let toggle in sapphireWebAppConfig.TOGGLES) {
+    envProperties[TOGGLE_PREFIX + toggle] = sapphireWebAppConfig.TOGGLES[toggle]; 
+  }  
+}
 JUnitXmlPlugin.prototype.onPrepare = async function () {
   if (browser) {
     currentBrowser = browser;
@@ -187,14 +203,9 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
 JUnitXmlPlugin.prototype.teardown = async function () {
   if (!pluginConfig) {
     pluginConfig = this.config;
-    console.log('HAMAHAHA: ERROR HERE ')
   }
-  let sapphireWebAppConfig = ' ';
-  let summary = 'Protractor UI e2e tests against ' + currentBrowser.baseUrl;
-  // console.debug('summary: ' + summary);
-  // debugger;
-  let suite = suites[await getBrowserId()];
 
+  let suite = suites[await getBrowserId()];
   
   // resolving path and creating dir if it doesn't exist
   if (pluginConfig.uniqueName === false) {
@@ -209,22 +220,7 @@ JUnitXmlPlugin.prototype.teardown = async function () {
   }
   if (pluginConfig.captureCOContextVar) {
     // add sapphireWebAppConfig app object properties
-    sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig.appVersion');
-    console.debug('sapphireWebAppConfig: ' + JSON.stringify(sapphireWebAppConfig))
-    const requiredKeys = ['environment', 'appName', 'appVersion', 
-    'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
-    'careOrchestratorLastBuildDate', 'gatewayUrl']
-    
-    // start from here in the next session
-    requiredKeys.forEach((item) => (metaDataContents.envProperties[item] = sapphireWebAppConfig[item]));
-    if(sapphireWebAppConfig.packagedDeps) {
-      metaDataContents.envProperties.pr_care_orchestrator_version = sapphireWebAppConfig.packagedDeps['pr.care-orchestrator'];
-    }
-    // Get toggles and add them using 
-    const TOGGLE_PREFIX = 'TOGGLES_'
-    for(let toggle in sapphireWebAppConfig.TOGGLES) {
-      metaDataContents.envProperties[TOGGLE_PREFIX + toggle] = sapphireWebAppConfig.TOGGLES[toggle]; 
-    }  
+    await addSapphireWebAppConfigProperties(metaDataContents.envProperties);
   }
 
   fs.writeFileSync(OUTDIR_FINAL + "/metadata.json", JSON.stringify(metaDataContents), function (err) {
