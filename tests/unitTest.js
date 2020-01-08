@@ -17,7 +17,6 @@ let protractorJunitXmlPlugin,
     noop = () => {};
 
 describe('plugin test', function () {
-    // before(() => {
         protractorJunitXmlPlugin = rewire('../index.js');
         protractorJunitXmlPlugin.__set__({
             os: fakeOs,
@@ -25,7 +24,6 @@ describe('plugin test', function () {
             builder: fakeBuilder,
             parseStringSync: fakeParseStringSync
         });
-    // });
 
     describe('if config captureCOContextVar is true', function () {
         protractorJunitXmlPlugin.__set__('pluginConfig', {
