@@ -210,7 +210,7 @@ JUnitXmlPlugin.prototype.teardown = async function () {
   if (pluginConfig.captureCOContextVar) {
     // add sapphireWebAppConfig app object properties
     sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig.appVersion');
-    console.debug('VCSVersion: ' + JSON.stringify(sapphireWebAppConfig))
+    console.debug('sapphireWebAppConfig: ' + JSON.stringify(sapphireWebAppConfig))
     const requiredKeys = ['environment', 'appName', 'appVersion', 
     'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
     'careOrchestratorLastBuildDate', 'gatewayUrl']
