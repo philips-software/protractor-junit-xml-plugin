@@ -117,7 +117,7 @@ let findXrayIdAndName = (name, parseXrayId) => {
   return finalObj;
 }
 const addSapphireWebAppConfigProperties = async (envProperties) => {
-  let sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig.appVersion');
+  let sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig');
   console.debug('sapphireWebAppConfig: ' + JSON.stringify(sapphireWebAppConfig))
   const requiredKeys = ['environment', 'appName', 'appVersion', 
   'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
