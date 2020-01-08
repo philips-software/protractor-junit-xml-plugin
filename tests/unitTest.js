@@ -25,7 +25,7 @@ describe('plugin test', function () {
             parseStringSync: fakeParseStringSync
         });
 
-    describe('if config captureCOContextVar is true', function () {
+    describe('if config captureSapphireWebAppContextVar is true', function () {
         protractorJunitXmlPlugin.__set__('pluginConfig', {
             path: '../', //path for protractor plugin
             outdir: '_test-reports',
@@ -34,7 +34,7 @@ describe('plugin test', function () {
             timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':', '_'),
             uniqueName: true, //default true
             uniqueFolder: true, // default false
-            captureCOContextVar: true //default false 
+            captureSapphireWebAppContextVar: true //default false 
         });
 
         

@@ -45,7 +45,7 @@ appendToFile: If set to true, it will append xml data to the bottom of the file 
 
 uniqueFolder: If set to true, it will create a new directory for each time the test suite is run. 
 
-captureCOContextVar(Default is false): If set to true, it will look for a global object `sapphireWebAppConfig` in the app and capture the properties like appName, appVersion etc from it to a metadata file that this plugin will generate for each run(in addition to testresults xml file). The idea is to capture all the runtime info related to the test results.
+captureSapphireWebAppContextVar(Default is false): If set to true, it will look for a global object `sapphireWebAppConfig` in the app and capture the properties like appName, appVersion etc from it to a metadata file that this plugin will generate for each run(in addition to testresults xml file). The idea is to capture all the runtime info related to the test results.
 
 ```
 

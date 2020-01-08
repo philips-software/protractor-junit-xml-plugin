@@ -67,7 +67,7 @@ exports.config = {
             appendToFile: false, //default false
             uniqueName: true, //default true
             uniqueFolder: true, // default false
-            captureCOContextVar: true //default false
+            captureSapphireWebAppContextVar: true //default false
         }
     ]
 };

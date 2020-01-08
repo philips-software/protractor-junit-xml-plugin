@@ -218,7 +218,7 @@ JUnitXmlPlugin.prototype.teardown = async function () {
     jiraProjectKey: pluginConfig.jiraProjectKey,
     envProperties: {}
   }
-  if (pluginConfig.captureCOContextVar) {
+  if (pluginConfig.captureSapphireWebAppContextVar) {
     // add sapphireWebAppConfig app object properties
     await addSapphireWebAppConfigProperties(metaDataContents.envProperties);
   }
