@@ -211,12 +211,20 @@ JUnitXmlPlugin.prototype.teardown = async function () {
     // add sapphireWebAppConfig app object properties
     sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig.appVersion');
     console.debug('VCSVersion: ' + JSON.stringify(sapphireWebAppConfig))
-    const requiredKeys = ['environment', 'appName', 'appVersion', 'pr.care-orchestrator',
+    const requiredKeys = ['environment', 'appName', 'appVersion', 
     'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
     'careOrchestratorLastBuildDate', 'gatewayUrl']
+    
     // start from here in the next session
-    // requiredKeys.forEach((item) => );
-    // envProperties[]
+    requiredKeys.forEach((item) => (metaDataContents.envProperties[item] = sapphireWebAppConfig[item]));
+    if(sapphireWebAppConfig.packagedDeps) {
+      metaDataContents.envProperties.pr_care_orchestrator_version = sapphireWebAppConfig.packagedDeps['pr.care-orchestrator'];
+    }
+    // Get toggles and add them using 
+    const TOGGLE_PREFIX = 'TOGGLES_'
+    for(let toggle in sapphireWebAppConfig.TOGGLES) {
+      metaDataContents.envProperties[TOGGLE_PREFIX + toggle] = sapphireWebAppConfig.TOGGLES[toggle]; 
+    }  
   }
 
   fs.writeFileSync(OUTDIR_FINAL + "/metadata.json", JSON.stringify(metaDataContents), function (err) {

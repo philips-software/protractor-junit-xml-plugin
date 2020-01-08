@@ -17,10 +17,11 @@ let protractorJunitXmlPlugin,
     fakePath = {
         resolve: () => '/fake-path'
     },
-    fakeParseStringSync = {};
+    fakeParseStringSync = {},
+    noop = () => {};
 
 describe('plugin test', function () {
-    before(() => {
+    // before(() => {
         protractorJunitXmlPlugin = rewire('../index.js');
         protractorJunitXmlPlugin.__set__({
             os: fakeOs,
@@ -28,12 +29,9 @@ describe('plugin test', function () {
             builder: fakeBuilder,
             parseStringSync: fakeParseStringSync
         });
-        protractorJunitXmlPlugin.__set__('pluginConfig', {
-            uniqueName: true
-        })
-    });
+    // });
 
-    it('if config captureCOContextVar is true then add sapphireWebAppConfig context fields in metadata file', async function () {
+    describe('if config captureCOContextVar is true', function () {
         protractorJunitXmlPlugin.__set__('pluginConfig', {
             path: '../', //path for protractor plugin
             outdir: '_test-reports',
@@ -44,28 +42,8 @@ describe('plugin test', function () {
             uniqueFolder: true, // default false
             captureCOContextVar: true //default false 
         });
-        protractorJunitXmlPlugin.__set__('currentBrowser', {
-            baseUrl: 'https://unit-test-fake-url.com',
-            executeScript: async function (input) {
-                console.log('fake executeScript is called with input: ' + input)
-                return {
-                    environment: "production",
-                    appName: "ClientCareOrchestrator",
-                    appVersion: "1.28.0-prerelease.46",
-                    'pr.care-orchestrator': "1.28.0-prerelease.42",
-                    isNewRelicEnabled: false,
-                    careOrchestratorVersion: "0.0.0",
-                    careOrchestratorBuildNumber: "11493",
-                    careOrchestratorLastBuildDate: "NOT_SET",
-                    TOGGLES_STATIC_TOGGLE_RWD: true,
-                    TOGGLES_STATIC_TOGGLE_F2482_Business_Reports: true,
-                    TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY: true,
-                    TOGGLES_STATIC_TOGGLE_F888: true,
-                    gatewayUrl: "http://nti-sapphiregateway-v1-server.cloud.pcftest.com:80"
-                }
-            }
 
-        });
+        
         let fakeCapabilities = {
             get: function () {
                 console.log('Coming in fakeCapabilities.get()');
@@ -86,31 +64,100 @@ describe('plugin test', function () {
             }
         });
 
-        const fakeFs = {
-            existsSync: () => {
-                return true;
-            },
-            writeFile: function () {
-                console.log('Coming in fake writeFile()');
-            },
-            writeFileSync: sinon.spy()
-        };
+        it('then add available sapphireWebAppConfig context fields in metadata', async function () {
+            const fakeFs = {
+                existsSync: () => {
+                    return true;
+                },
+                writeFile: noop,
+                writeFileSync: sinon.spy()
+            };
+            protractorJunitXmlPlugin.__set__('fs', fakeFs);
+        
+            protractorJunitXmlPlugin.__set__('currentBrowser', {
+                baseUrl: 'https://unit-test-fake-url.com',
+                executeScript: async function (input) {
+                    console.log('fake executeScript is called with input: ' + input)
+                    return {
+                        environment: "production",
+                        appName: "ClientCareOrchestrator",
+                        appVersion: "1.28.0-prerelease.46",
+                        packagedDeps: {
+                            'pr.care-orchestrator': "1.28.0-prerelease.42"
+                        },
+                        isNewRelicEnabled: false,
+                        careOrchestratorVersion: "0.0.0",
+                        careOrchestratorBuildNumber: "11493",
+                        careOrchestratorLastBuildDate: "NOT_SET",
+                        TOGGLES: {
+                            STATIC_TOGGLE_RWD: true,
+                            STATIC_TOGGLE_F2482_Business_Reports: true,
+                            STATIC_ENABLE_SAPPHIRE_GATEWAY: true,
+                            STATIC_TOGGLE_F888: true
+                        },
+                        gatewayUrl: "http://nti-sapphiregateway-v1-server.cloud.pcftest.com:80"
+                    }
+                }
+            });
+            await protractorJunitXmlPlugin.teardown();
 
-        protractorJunitXmlPlugin.__set__('fs', fakeFs);
+            console.log('if writeFileSync spy is called: ' + fakeFs.writeFileSync.called);
+            const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
+            expect(metadata).to.exist;
+            expect(metadata).to.have.all.keys(['jiraProjectKey', 'envProperties']);
+            const envProperties = metadata.envProperties;
+            expect(envProperties).to.include.all.keys([
+                'environment', 'appName', 'appVersion', 'pr_care_orchestrator_version',
+                'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
+                'careOrchestratorLastBuildDate', 'TOGGLES_STATIC_TOGGLE_RWD',
+                'TOGGLES_STATIC_TOGGLE_F2482_Business_Reports', 'TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY',
+                'gatewayUrl'
+            ]);
+        })
+        it('and sapphireWebAppConfig.packagedDeps and sapphireWebAppConfig.TOGGLES are not available then dont add those fields in metadata', 
+        async function () {
+            const fakeFs = {
+                existsSync: () => {
+                    return true;
+                },
+                writeFile: noop,
+                writeFileSync: sinon.spy()
+            };
+            protractorJunitXmlPlugin.__set__('fs', fakeFs);
+        
+            protractorJunitXmlPlugin.__set__('currentBrowser', {
+                baseUrl: 'https://unit-test-fake-url.com',
+                executeScript: async function (input) {
+                    console.log('fake executeScript is called with input: ' + input)
+                    return {
+                        environment: "production",
+                        appName: "ClientCareOrchestrator",
+                        appVersion: "1.28.0-prerelease.46",
+                        isNewRelicEnabled: false,
+                        careOrchestratorVersion: "0.0.0",
+                        careOrchestratorBuildNumber: "11493",
+                        careOrchestratorLastBuildDate: "NOT_SET",
+                        gatewayUrl: "http://nti-sapphiregateway-v1-server.cloud.pcftest.com:80"
+                    }
+                }
+            });
+            
+            await protractorJunitXmlPlugin.teardown();
 
-        await protractorJunitXmlPlugin.teardown();
+            console.log('if writeFileSync spy is called: ' + fakeFs.writeFileSync.called);
+            const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
+            expect(metadata).to.exist;
+            expect(metadata).to.have.all.keys(['jiraProjectKey', 'envProperties']);
+            const envProperties = metadata.envProperties;
 
-        console.log('if writeFileSync spy is called: ' + fakeFs.writeFileSync.called);
-        const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
-        expect(metadata).to.exist;
-        expect(metadata).to.have.all.keys(['jiraProjectKey', 'envProperties']);
-        const envProperties = metadata.envProperties;
-        expect(envProperties).to.include.any.keys([
-            'environment', 'appName', 'appVersion', 'pr.care-orchestrator',
-            'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
-            'careOrchestratorLastBuildDate', 'TOGGLES_STATIC_TOGGLE_RWD',
-            'TOGGLES_STATIC_TOGGLE_F2482_Business_Reports', 'TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY',
-            'gatewayUrl'
-        ]);
+            expect(envProperties).to.include.all.keys([
+                'environment', 'appName', 'appVersion', 
+                'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
+                'careOrchestratorLastBuildDate', 
+                'gatewayUrl'
+            ])
+            expect(envProperties).to.not.have.any.keys(['pr_care_orchestrator_version', 'TOGGLES_STATIC_TOGGLE_RWD',
+            'TOGGLES_STATIC_TOGGLE_F2482_Business_Reports', 'TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY']);
+        })
     })
 });
