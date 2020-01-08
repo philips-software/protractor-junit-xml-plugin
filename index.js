@@ -1,5 +1,5 @@
 'use strict'
-let os = require('os'),
+const os = require('os'),
   path = require('path'),
   fs = require('fs'),
   builder = require('xmlbuilder'),
