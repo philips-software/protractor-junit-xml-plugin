@@ -1,6 +1,4 @@
-let chai = require('chai');
-let expect = chai.expect;
-const assert = chai.assert;
+let expect = require('chai').expect;
 
 'use strict'
 
