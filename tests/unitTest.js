@@ -1,8 +1,6 @@
 let chai = require('chai');
 let expect = chai.expect;
 const assert = chai.assert;
-// chai.use(require('sinon-chai'))
-
 
 'use strict'
 
