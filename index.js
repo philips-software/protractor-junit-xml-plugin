@@ -1,48 +1,50 @@
 'use strict'
 const os = require('os'),
-      path = require('path'),
-      fs = require('fs'),
-      builder = require('xmlbuilder'),
-      parseStringSync = require('xml2js-parser').parseStringSync,
-      JUNITXMLPLUGIN = 'JUnitXrayPlugin: ';
+  path = require('path'),
+  fs = require('fs'),
+  builder = require('xmlbuilder'),
+  parseStringSync = require('xml2js-parser').parseStringSync;
 
-let outputFile,
-    OUTDIR_FINAL,
-    xml,
-    suites,
-    testCount, 
-    failCount,
-    currentCapabilities;
-    
-let JUnitXmlPlugin = function () {}
+let JUNITXMLPLUGIN = 'JUnitXrayPlugin: ',
+  OUTDIR_FINAL,
+  currentBrowser,
+  outputFile,
+  pluginConfig,
+  xml,
+  suites,
+  testCount,
+  failCount,
+  currCapabilities;
+
+let JUnitXmlPlugin = function () { }
 
 let getBrowserId = async () => {
-  if (!currentCapabilities) {
-    currentCapabilities = await browser.getCapabilities();
+  if (!currCapabilities) {
+    currCapabilities = await currentBrowser.getCapabilities();
   }
-  return currentCapabilities.get('webdriver.remote.sessionid');
+  return currCapabilities.get('webdriver.remote.sessionid');
 }
 
 let initliazeXmlForBrowser = async function () {
   let timestamp = (new Date()).toISOString().substr(0, 19);
-  let name = currentCapabilities.get('browserName') + ' ' + currentCapabilities.get('browserVersion');
-  suites[getBrowserId()] = xml.ele('testsuite', {
+  let name = currCapabilities.get('browserName') + ' ' + currCapabilities.get('browserVersion');
+  suites[await getBrowserId()] = xml.ele('testsuite', {
     name: name, timestamp: timestamp, id: 0, hostname: os.hostname()
   });
 };
 
 let resolveCompleteFileName = (givenFileName, givenDir, uniqueFolder, givenTimestamp) => {
   // let OUTDIR_FINAL = ''
-  if(uniqueFolder){ 
+  if (uniqueFolder) {
     OUTDIR_FINAL = (givenDir || '_test-reports/e2e-test-results') + '/browser-based-results_' + givenTimestamp;
   } else {
     OUTDIR_FINAL = (givenDir || '_test-reports/e2e-test-results') + '/browser-based-results';
   }
-  const FILE_NAME = currentCapabilities.get('browserName') + '-' + (givenFileName || 'test-results.xml')
+  const FILE_NAME = currCapabilities.get('browserName') + '-' + (givenFileName || 'test-results.xml')
 
   if (!fs.existsSync(OUTDIR_FINAL)) {
-    console.info('CREATING DIR + ' + OUTDIR_FINAL);
-    fs.mkdir(OUTDIR_FINAL, { recursive: true }, function(){});
+    console.info(JUNITXMLPLUGIN + 'CREATING DIR + ' + OUTDIR_FINAL);
+    fs.mkdir(OUTDIR_FINAL, { recursive: true }, function () { });
   }
 
   return path.resolve(OUTDIR_FINAL, FILE_NAME);
@@ -83,7 +85,7 @@ let getJsonInXmlBuilderExpectedFormat = (inputFile) => {
             testcaseFinal.failure = [];
             let failureFinal = {};
             addAttr(failure.$, failureFinal);
-            
+
             testcaseFinal.failure.push(failureFinal);
           });
         }
@@ -100,7 +102,7 @@ let findXrayIdAndName = (name, parseXrayId) => {
   let finalObj = {};
   if (parseXrayId) {
     let tags = name.split(':', 3);
-    
+
     if (tags.length > 1) {
       finalObj.xrayId = tags[1];
       finalObj.name = tags[2].trim();
@@ -109,20 +111,42 @@ let findXrayIdAndName = (name, parseXrayId) => {
       finalObj.name = name;
     }
   } else {
-    finalObj.name = name; 
+    finalObj.name = name;
   }
 
   return finalObj;
 }
-
+const addSapphireWebAppConfigProperties = async (envProperties) => {
+  let sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig');
+  console.debug('sapphireWebAppConfig: ' + JSON.stringify(sapphireWebAppConfig))
+  const requiredKeys = ['environment', 'appName', 'appVersion', 
+  'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
+  'careOrchestratorLastBuildDate', 'gatewayUrl']
+  
+  requiredKeys.forEach((item) => (envProperties[item] = sapphireWebAppConfig[item]));
+  if(sapphireWebAppConfig.packagedDeps) {
+    envProperties.pr_care_orchestrator_version = sapphireWebAppConfig.packagedDeps['pr.care-orchestrator'];
+  }
+  // Get toggles and add them in metadata 
+  const TOGGLE_PREFIX = 'TOGGLES_'
+  for(let toggle in sapphireWebAppConfig.TOGGLES) {
+    envProperties[TOGGLE_PREFIX + toggle] = sapphireWebAppConfig.TOGGLES[toggle]; 
+  }  
+}
 JUnitXmlPlugin.prototype.onPrepare = async function () {
-  var pluginConfig = this.config;
-  if(pluginConfig.uniqueName && pluginConfig.appendToFile || pluginConfig.uniqueFolder && pluginConfig.appendToFile) {
+  if (browser) {
+    currentBrowser = browser;
+  }
+  if (!pluginConfig) {
+    pluginConfig = this.config;
+  }
+  if (pluginConfig.uniqueName && pluginConfig.appendToFile || pluginConfig.uniqueFolder && pluginConfig.appendToFile) {
     throw new Error('You can not have a unique name or folder every time as well as appending results to the same file')
   }
-  currentCapabilities = await browser.getCapabilities();
+  currCapabilities = await currentBrowser.getCapabilities();
+
   //use uniqueName
-  if (pluginConfig.uniqueName === false){
+  if (pluginConfig.uniqueName === false) {
     outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
   } else {
     outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
@@ -132,7 +156,7 @@ JUnitXmlPlugin.prototype.onPrepare = async function () {
   suites = Object.create(null);
 
   if (fs.existsSync(outputFile) && pluginConfig.appendToFile) {
-    console.debug('Found existing outputFile and using it for ' + currentCapabilities.get('browserName'));
+    console.debug('Found existing outputFile and using it for ' + currCapabilities.get('browserName'));
 
     xml = builder.create(getJsonInXmlBuilderExpectedFormat(outputFile));
   } else {
@@ -145,12 +169,15 @@ JUnitXmlPlugin.prototype.onPrepare = async function () {
 };
 
 JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
-  let pluginConfig = this.config;
+  if (!pluginConfig) {
+    pluginConfig = this.config;
+    console.log('HAMAHAHA: ERROR HERE ')
+  }
 
   let testInfo = findXrayIdAndName(result.name, pluginConfig.parseXrayId);
 
   if (pluginConfig.xrayIdOnlyTests) {
-    if (!testInfo.xrayId) return;    
+    if (!testInfo.xrayId) return;
     console.debug('XRAY id tag: ' + testInfo.xrayId);
   }
 
@@ -165,7 +192,7 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
     testcase.requirements = testInfo.xrayId;
   }
 
-  let spec = suites[getBrowserId()].ele('testcase', testcase);
+  let spec = suites[await getBrowserId()].ele('testcase', testcase);
 
   if (!passed) {
     spec.ele('failure', { msg: 'testcase failed' });
@@ -174,33 +201,35 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
 };
 
 JUnitXmlPlugin.prototype.teardown = async function () {
-  let pluginConfig = this.config;
-  let vcsVersion = ' ';
-  let summary = 'Protractor UI e2e tests against ' + browser.baseUrl;
-  // console.debug('summary: ' + summary);
- 
-  if (pluginConfig.uniqueName === false){
+  if (!pluginConfig) {
+    pluginConfig = this.config;
+  }
+
+  let suite = suites[await getBrowserId()];
+  
+  // resolving path and creating dir if it doesn't exist
+  if (pluginConfig.uniqueName === false) {
     outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
   } else {
     outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
   }
 
-  if(pluginConfig.useSapphireVCSBuildNumber) {
-    vcsVersion = await browser.executeScript('return sapphireWebAppConfig.appVersion');
-    console.log('VCSVersion: ' + vcsVersion)
-  }
   let metaDataContents = {
-    buildNumber: vcsVersion,
-    summary: summary
+    jiraProjectKey: pluginConfig.jiraProjectKey,
+    envProperties: {}
   }
+  if (pluginConfig.captureSapphireWebAppContextVar) {
+    // add sapphireWebAppConfig app object properties
+    await addSapphireWebAppConfigProperties(metaDataContents.envProperties);
+  }
+
   fs.writeFileSync(OUTDIR_FINAL + "/metadata.json", JSON.stringify(metaDataContents), function (err) {
-  if (err) {
-        console.warn('Cannot write metadata file\n\t' + err.message);
-  } else {
-        console.debug('Metadata file results written to metadata.json');
-  }});
- 
-  let suite = suites[getBrowserId()];
+    if (err) {
+      console.warn('Cannot write metadata file\n\t' + err.message);
+    } else {
+      console.debug('Metadata file results written to metadata.json');
+    }
+  });
 
   suite.att('tests', testCount);
   suite.att('failures', failCount);

@@ -12,15 +12,15 @@ exports.config = {
 
     allScriptsTimeout: 110000,
     specs: [
-        './pluginTest.js'
+        './e2eTest.js'
     ],
     SELENIUM_PROMISE_MANAGER: false,
     capabilities: {
         browserName: 'chrome',
         chromeOptions: {
             // "args": ["incognito", "--window-size=1920,1080", "start-maximized", "--test-type=browser"],
-            args: ['disable-extensions'],
-            // args: ['--headless', 'disable-extensions'],
+            // args: ['disable-extensions'],
+            args: ['--headless', 'disable-extensions'],
             prefs: {
                 download: {
                     prompt_for_download: false
@@ -61,13 +61,13 @@ exports.config = {
             outdir: '_test-reports',
             filename: 'e2e-tests',
             parseXrayId: true, //default false
-            projectKey: 'CARE',
+            jiraProjectKey: 'CARE',
             timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':','_'),
             xrayIdOnly: false, //default false
             appendToFile: false, //default false
             uniqueName: true, //default true
             uniqueFolder: true, // default false
-            useSapphireVCSBuildNumber: true //default false 
+            captureSapphireWebAppContextVar: true //default false
         }
     ]
 };

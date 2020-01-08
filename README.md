@@ -45,16 +45,7 @@ appendToFile: If set to true, it will append xml data to the bottom of the file 
 
 uniqueFolder: If set to true, it will create a new directory for each time the test suite is run. 
 
-useSapphireVCSBuildNumber: If set to true, this value will look for the sapphire vcs build number from the application and use it in the metadata file
-
-```
-
-The following are the configureable params
-```
-
-metadataFile.buildNumber: This is an optional value that can be set. If set it will create a Metadata.properties file in the test directory that will contain this and the summary value.
-
-metadataFile.summary: This is an optional value that can be set. If buildNumber is set, this value is placed in the created Metadata.properties file.
+captureSapphireWebAppContextVar(Default is false): If set to true, it will look for a global object `sapphireWebAppConfig` in the app and capture the properties like appName, appVersion etc from it to a metadata file that this plugin will generate for each run(in addition to testresults xml file). The idea is to capture all the runtime info related to the test results.
 
 ```
 

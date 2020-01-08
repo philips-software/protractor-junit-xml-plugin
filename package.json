@@ -1,6 +1,6 @@
 {
   "name": "protractor-junit-xml-plugin",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "A Protracotor plugin. Report results in junit xml format including requirement ids if available.",
   "main": "index.js",
   "files": [
@@ -31,10 +31,12 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "express": "^4.17.1",
     "chai": "^3.5.0",
+    "express": "^4.17.1",
     "jasmine-spec-reporter": "^4.2.1",
-    "mocha": "^3.2.0"
+    "mocha": "^3.2.0",
+    "rewire": "^4.0.1",
+    "sinon": "^8.0.4"  
   },
   "contributors": []
 }

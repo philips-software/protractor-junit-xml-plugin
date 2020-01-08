@@ -1,7 +1,23 @@
 <!-- javascript tag that sets sapphire build number -->
-<script type="text/javascript"> 
-var sapphireWebAppConfig = {
-    appVersion:'1.1.0'
-}
+<script type="text/javascript">
+    var sapphireWebAppConfig = {
+        environment: "production",
+        appName: "ClientCareOrchestrator",
+        appVersion: "1.28.0-prerelease.46",
+        packagedDeps: {
+            'pr.care-orchestrator': "1.28.0-prerelease.42"
+        },
+        isNewRelicEnabled: false,
+        careOrchestratorVersion: "0.0.0",
+        careOrchestratorBuildNumber: "11493",
+        careOrchestratorLastBuildDate: "NOT_SET",
+        TOGGLES: {
+            STATIC_TOGGLE_RWD: true,
+            STATIC_TOGGLE_F2482_Business_Reports: true,
+            STATIC_ENABLE_SAPPHIRE_GATEWAY: true,
+            STATIC_TOGGLE_F888: true
+        },
+        gatewayUrl: "http://nti-sapphiregateway-v1-server.cloud.pcftest.com:80"
+    }
 </script>
 <h2>This is node test app for junit-xml-plugin</h2>
