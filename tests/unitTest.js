@@ -82,21 +82,71 @@ describe('In protractor-junit-xml-plugin', function () {
         }
     });
 
-    // TODO: Fix the following test
+    let addGivenKeysToProcessEnv = (strKeys) => {
+        const TEST_VALUE = 'TEST_VALUE_';
+        let finalEnv = {};
+        strKeys.forEach((key, index) => {
+            finalEnv[key] = TEST_VALUE + index;
+        });
+        let revert = protractorJunitXmlPlugin.__set__('process.env', finalEnv);
+        return revert;
+    }
+
+    let setupFakefs = () => {
+        const fakeFs = {
+            existsSync: () => {
+                return true;
+            },
+            writeFile: noop,
+            writeFileSync: sinon.spy()
+        };
+        protractorJunitXmlPlugin.__set__('fs', fakeFs); 
+        return fakeFs;
+    }
     it('if process.env has the following variables then it should add them in envProperties', async function () {
-        const varList = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME', 'USER', 'LANG', 'PWD'];
-        
-        // TODO: Continue from here
+        const reqKeys = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME', 'USER', 'LANG', 'PWD'];
+        const fakeFs = setupFakefs();
+
+        let revert = addGivenKeysToProcessEnv(reqKeys);
+
+        await protractorJunitXmlPlugin.teardown();
+
+        const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
+        expect(metadata).to.exist;
+        expect(metadata).to.have.all.keys(['jiraProjectKey', 'envProperties']);
+        const envProperties = metadata.envProperties;
+        expect(envProperties).to.include.keys(reqKeys);
+        revert();
     });
 
-    // TODO: Fix the following test
     it('if process.env do not have the following variables then it should not add them in envProperties', async function () {
+        const testKeys = ['USER', 'LANG', 'PWD'];
+        const varToAdd = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME'];
 
-    })
+        let revert = addGivenKeysToProcessEnv(reqKeys);
+        const fakeFs = setupFakefs();
 
-    // TODO: Fix the following test
-    describe('if process.env do not have TEAMCITY_BUILDCONF_NAME and BUILD_NUMBER', async function () {
-        it('and sapphireWebAppConfig has related info then it should try to populate it from sapphireWebAppConfig global');
+        await protractorJunitXmlPlugin.teardown();
+
+        const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
+        expect(metadata).to.exist;
+        expect(metadata).to.have.all.keys(['jiraProjectKey', 'envProperties']);
+        const envProperties = metadata.envProperties;
+        expect(envProperties).to.not.include.keys(testKeys);
+        revert();
+    });
+
+    describe('if process.env do not have TEAMCITY_BUILDCONF_NAME and BUILD_NUMBER', function () {
+        it('and sapphireWebAppConfig has related info then it should try to populate it from sapphireWebAppConfig global', async function() {
+            const reqKeys = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME'];
+            const fakeFs = setupFakefs();
+
+            await protractorJunitXmlPlugin.teardown();
+    
+            const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
+            const envProperties = metadata.envProperties;
+            expect(envProperties).to.include.keys(reqKeys); 
+        });
 
         it('and sapphireWebAppConfig is not available then it should use default values from Plugin and user info from process.env');
 
@@ -118,14 +168,7 @@ describe('In protractor-junit-xml-plugin', function () {
         });
 
         it('then it should not capture any sapphireWebAppConfig context fields in metadata', async function () {
-            const fakeFs = {
-                existsSync: () => {
-                    return true;
-                },
-                writeFile: noop,
-                writeFileSync: sinon.spy()
-            };
-            protractorJunitXmlPlugin.__set__('fs', fakeFs);
+            const fakeFs = setupFakefs();
 
             protractorJunitXmlPlugin.__set__('currentBrowser', {
                 baseUrl: 'https://unit-test-fake-url.com',
@@ -175,15 +218,8 @@ describe('In protractor-junit-xml-plugin', function () {
         });
 
         it('then add available sapphireWebAppConfig context fields in metadata', async function () {
-            const fakeFs = {
-                existsSync: () => {
-                    return true;
-                },
-                writeFile: noop,
-                writeFileSync: sinon.spy()
-            };
-            protractorJunitXmlPlugin.__set__('fs', fakeFs);
-    
+            const fakeFs = setupFakefs();
+
             protractorJunitXmlPlugin.__set__('currentBrowser', {
                 baseUrl: 'https://unit-test-fake-url.com',
                 executeScript: async function (input) {
@@ -209,7 +245,7 @@ describe('In protractor-junit-xml-plugin', function () {
                     }
                 }
             });
-        
+
             await protractorJunitXmlPlugin.teardown();
 
             const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
@@ -226,14 +262,7 @@ describe('In protractor-junit-xml-plugin', function () {
         })
         it('and sapphireWebAppConfig.packagedDeps and sapphireWebAppConfig.TOGGLES are not available then dont add those fields in metadata',
             async function () {
-                const fakeFs2 = {
-                    existsSync: () => {
-                        return true;
-                    },
-                    writeFile: noop,
-                    writeFileSync: sinon.spy()
-                };
-                protractorJunitXmlPlugin.__set__('fs', fakeFs2);
+                const fakeFs2 = setupFakefs();
 
                 protractorJunitXmlPlugin.__set__('currentBrowser', {
                     baseUrl: 'https://unit-test-fake-url.com',

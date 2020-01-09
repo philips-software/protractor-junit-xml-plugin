@@ -124,21 +124,25 @@ const addSapphireWebAppConfigProperties = async (envProperties) => {
     'careOrchestratorLastBuildDate', 'gatewayUrl'];
   const PR_CARE_ORCH_KEY = 'pr.care-orchestrator',
     TOGGLES_KEY = 'TOGGLES',
-    PACKAGED_DEPS = 'packagedDeps';
-  requiredKeys.forEach((item) => {
-    if (item != PACKAGED_DEPS || item != TOGGLES) {
-      envProperties[item] = sapphireWebAppConfig[item]
-    }
-  });
-  if (sapphireWebAppConfig.packagedDeps) {
+    PACKAGED_DEPS_KEY = 'packagedDeps';
+  
+  requiredKeys.forEach((item) => (envProperties[item] = sapphireWebAppConfig[item]));
+
+  if (sapphireWebAppConfig[PACKAGED_DEPS_KEY]) {
     envProperties.pr_care_orchestrator_version = sapphireWebAppConfig.packagedDeps[PR_CARE_ORCH_KEY];
   }
   // Get toggles and add them in metadata 
   const TOGGLE_PREFIX = 'TOGGLES_'
-  for (let toggle in sapphireWebAppConfig.TOGGLES) {
+  for (let toggle in sapphireWebAppConfig[TOGGLES_KEY]) {
     envProperties[TOGGLE_PREFIX + toggle] = sapphireWebAppConfig.TOGGLES[toggle];
   }
 }
+
+const addReqProcessEnvProp = (envProperties) => {
+  const reqKeys = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME', 'USER', 'LANG', 'PWD'];
+  reqKeys.forEach((key) => (envProperties[key] = process.env[key]));
+  console.log('process.env.BUILD_NUMBER: ' + process.env.BUILD_NUMBER);
+} 
 JUnitXmlPlugin.prototype.onPrepare = async function () {
   if (browser) {
     currentBrowser = browser;
@@ -228,6 +232,9 @@ JUnitXmlPlugin.prototype.teardown = async function () {
     // add sapphireWebAppConfig app object properties
     await addSapphireWebAppConfigProperties(metaDataContents.envProperties);
   }
+
+  // add process.env useful properties
+  addReqProcessEnvProp(metaDataContents.envProperties);
 
   fs.writeFileSync(OUTDIR_FINAL + "/metadata.json", JSON.stringify(metaDataContents), function (err) {
     if (err) {
