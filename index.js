@@ -118,20 +118,26 @@ let findXrayIdAndName = (name, parseXrayId) => {
 }
 const addSapphireWebAppConfigProperties = async (envProperties) => {
   let sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig');
-  console.debug('sapphireWebAppConfig: ' + JSON.stringify(sapphireWebAppConfig))
-  const requiredKeys = ['environment', 'appName', 'appVersion', 
-  'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
-  'careOrchestratorLastBuildDate', 'gatewayUrl']
-  
-  requiredKeys.forEach((item) => (envProperties[item] = sapphireWebAppConfig[item]));
-  if(sapphireWebAppConfig.packagedDeps) {
-    envProperties.pr_care_orchestrator_version = sapphireWebAppConfig.packagedDeps['pr.care-orchestrator'];
+  console.debug('sapphireWebAppConfig: ' + JSON.stringify(sapphireWebAppConfig));
+  const requiredKeys = ['environment', 'appName', 'appVersion',
+    'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
+    'careOrchestratorLastBuildDate', 'gatewayUrl'];
+  const PR_CARE_ORCH_KEY = 'pr.care-orchestrator',
+    TOGGLES_KEY = 'TOGGLES',
+    PACKAGED_DEPS = 'packagedDeps';
+  requiredKeys.forEach((item) => {
+    if (item != PACKAGED_DEPS || item != TOGGLES) {
+      envProperties[item] = sapphireWebAppConfig[item]
+    }
+  });
+  if (sapphireWebAppConfig.packagedDeps) {
+    envProperties.pr_care_orchestrator_version = sapphireWebAppConfig.packagedDeps[PR_CARE_ORCH_KEY];
   }
   // Get toggles and add them in metadata 
   const TOGGLE_PREFIX = 'TOGGLES_'
-  for(let toggle in sapphireWebAppConfig.TOGGLES) {
-    envProperties[TOGGLE_PREFIX + toggle] = sapphireWebAppConfig.TOGGLES[toggle]; 
-  }  
+  for (let toggle in sapphireWebAppConfig.TOGGLES) {
+    envProperties[TOGGLE_PREFIX + toggle] = sapphireWebAppConfig.TOGGLES[toggle];
+  }
 }
 JUnitXmlPlugin.prototype.onPrepare = async function () {
   if (browser) {
@@ -206,7 +212,7 @@ JUnitXmlPlugin.prototype.teardown = async function () {
   }
 
   let suite = suites[await getBrowserId()];
-  
+
   // resolving path and creating dir if it doesn't exist
   if (pluginConfig.uniqueName === false) {
     outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);

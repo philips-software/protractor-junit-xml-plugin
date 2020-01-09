@@ -85,6 +85,7 @@ describe('In protractor-junit-xml-plugin', function () {
     // TODO: Fix the following test
     it('if process.env has the following variables then it should add them in envProperties', async function () {
         const varList = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME', 'USER', 'LANG', 'PWD'];
+        
         // TODO: Continue from here
     });
 
