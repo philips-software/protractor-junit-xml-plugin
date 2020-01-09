@@ -123,7 +123,7 @@ describe('In protractor-junit-xml-plugin', function () {
         const testKeys = ['USER', 'LANG', 'PWD'];
         const varToAdd = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME'];
 
-        let revert = addGivenKeysToProcessEnv(reqKeys);
+        let revert = addGivenKeysToProcessEnv(varToAdd);
         const fakeFs = setupFakefs();
 
         await protractorJunitXmlPlugin.teardown();
@@ -148,14 +148,55 @@ describe('In protractor-junit-xml-plugin', function () {
             expect(envProperties).to.include.keys(reqKeys); 
         });
 
-        it('and sapphireWebAppConfig is not available then it should use default values from Plugin and user info from process.env');
+        it('and sapphireWebAppConfig is not available then it should use default values from Plugin and user info from process.env', async function() {
+            const fakeFs = setupFakefs();
 
-        it('and sapphireWebAppConfig does not have that info then it should use default values from Plugin and user info from process.env')
+            // setting up sapphireWebAppConfig null
+            protractorJunitXmlPlugin.__set__('currentBrowser', {
+                baseUrl: 'https://unit-test-fake-url.com',
+                executeScript: async function (input) {
+                    console.log('fake executeScript is called with input: ' + input)
+                    return null;
+                }
+            });
+
+            await protractorJunitXmlPlugin.teardown();
+    
+            const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
+            const envProperties = metadata.envProperties;
+            expect(envProperties).to.include.keys('TEAMCITY_BUILDCONF_NAME'); 
+        });
+
+        it('and sapphireWebAppConfig does not have that info then it should use default values from Plugin and user info from process.env', async function() {
+            const fakeFs = setupFakefs();
+
+            // setting up sapphireWebAppConfig without appName
+            protractorJunitXmlPlugin.__set__('currentBrowser', {
+                baseUrl: 'https://unit-test-fake-url.com',
+                executeScript: async function (input) {
+                    console.log('fake executeScript is called with input: ' + input)
+                    return {
+                        environment: "production",
+                        appVersion: "1.28.0-prerelease.46",
+                        careOrchestratorBuildNumber: "11493",
+                        careOrchestratorLastBuildDate: "NOT_SET",
+                        TOGGLES: {
+                            STATIC_TOGGLE_RWD: true,
+                        },
+                        gatewayUrl: "http://nti-sapphiregateway-v1-server.cloud.pcftest.com:80"
+                    }
+                }
+            });
+        
+            await protractorJunitXmlPlugin.teardown();
+    
+            const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
+            const envProperties = metadata.envProperties;
+            expect(envProperties).to.include.keys('TEAMCITY_BUILDCONF_NAME');  
+        });
 
     })
 
-
-    // TODO: Fix the following test
     describe('if config captureSapphireWebAppContextVar is not set', function () {
         protractorJunitXmlPlugin.__set__('pluginConfig', {
             path: '../', //path for protractor plugin
@@ -195,7 +236,7 @@ describe('In protractor-junit-xml-plugin', function () {
             expect(metadata).to.have.all.keys(['jiraProjectKey', 'envProperties']);
             const envProperties = metadata.envProperties;
             expect(envProperties).to.not.include.keys([
-                'environment', 'appName', 'appVersion', 'pr_care_orchestrator_version',
+                'environment', 'appName', 'appVersion', 'PR_CARE_ORCHESTRATOR_VERSION',
                 'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
                 'careOrchestratorLastBuildDate', 'TOGGLES_STATIC_TOGGLE_RWD',
                 'TOGGLES_STATIC_TOGGLE_F2482_Business_Reports', 'TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY',
@@ -253,7 +294,7 @@ describe('In protractor-junit-xml-plugin', function () {
             expect(metadata).to.have.all.keys(['jiraProjectKey', 'envProperties']);
             const envProperties = metadata.envProperties;
             expect(envProperties).to.include.all.keys([
-                'environment', 'appName', 'appVersion', 'pr_care_orchestrator_version',
+                'environment', 'appName', 'appVersion', 'PR_CARE_ORCHESTRATOR_VERSION',
                 'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
                 'careOrchestratorLastBuildDate', 'TOGGLES_STATIC_TOGGLE_RWD',
                 'TOGGLES_STATIC_TOGGLE_F2482_Business_Reports', 'TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY',
@@ -294,7 +335,7 @@ describe('In protractor-junit-xml-plugin', function () {
                     'careOrchestratorLastBuildDate',
                     'gatewayUrl'
                 ])
-                expect(envProperties).to.not.have.keys(['pr_care_orchestrator_version', 'TOGGLES_STATIC_TOGGLE_RWD',
+                expect(envProperties).to.not.have.keys(['PR_CARE_ORCHESTRATOR_VERSION', 'TOGGLES_STATIC_TOGGLE_RWD',
                     'TOGGLES_STATIC_TOGGLE_F2482_Business_Reports', 'TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY']);
             })
     })

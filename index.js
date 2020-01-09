@@ -7,6 +7,7 @@ const os = require('os'),
 
 let JUNITXMLPLUGIN = 'JUnitXrayPlugin: ',
   OUTDIR_FINAL,
+  PR_CARE_ORCHESTRATOR_VERSION = 'PR_CARE_ORCHESTRATOR_VERSION',
   currentBrowser,
   outputFile,
   pluginConfig,
@@ -118,6 +119,9 @@ let findXrayIdAndName = (name, parseXrayId) => {
 }
 const addSapphireWebAppConfigProperties = async (envProperties) => {
   let sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig');
+
+  // if sapphireWebAppConfig global var not present then quit
+  if (!sapphireWebAppConfig) return;
   console.debug('sapphireWebAppConfig: ' + JSON.stringify(sapphireWebAppConfig));
   const requiredKeys = ['environment', 'appName', 'appVersion',
     'isNewRelicEnabled', 'careOrchestratorVersion', 'careOrchestratorBuildNumber',
@@ -125,11 +129,11 @@ const addSapphireWebAppConfigProperties = async (envProperties) => {
   const PR_CARE_ORCH_KEY = 'pr.care-orchestrator',
     TOGGLES_KEY = 'TOGGLES',
     PACKAGED_DEPS_KEY = 'packagedDeps';
-  
+
   requiredKeys.forEach((item) => (envProperties[item] = sapphireWebAppConfig[item]));
 
   if (sapphireWebAppConfig[PACKAGED_DEPS_KEY]) {
-    envProperties.pr_care_orchestrator_version = sapphireWebAppConfig.packagedDeps[PR_CARE_ORCH_KEY];
+    envProperties[PR_CARE_ORCHESTRATOR_VERSION] = sapphireWebAppConfig.packagedDeps[PR_CARE_ORCH_KEY];
   }
   // Get toggles and add them in metadata 
   const TOGGLE_PREFIX = 'TOGGLES_'
@@ -141,8 +145,7 @@ const addSapphireWebAppConfigProperties = async (envProperties) => {
 const addReqProcessEnvProp = (envProperties) => {
   const reqKeys = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME', 'USER', 'LANG', 'PWD'];
   reqKeys.forEach((key) => (envProperties[key] = process.env[key]));
-  console.log('process.env.BUILD_NUMBER: ' + process.env.BUILD_NUMBER);
-} 
+}
 JUnitXmlPlugin.prototype.onPrepare = async function () {
   if (browser) {
     currentBrowser = browser;
@@ -228,13 +231,29 @@ JUnitXmlPlugin.prototype.teardown = async function () {
     jiraProjectKey: pluginConfig.jiraProjectKey,
     envProperties: {}
   }
-  if (pluginConfig.captureSapphireWebAppContextVar) {
-    // add sapphireWebAppConfig app object properties
-    await addSapphireWebAppConfigProperties(metaDataContents.envProperties);
-  }
 
   // add process.env useful properties
   addReqProcessEnvProp(metaDataContents.envProperties);
+
+  if (pluginConfig.captureSapphireWebAppContextVar) {
+    // add sapphireWebAppConfig app object properties
+    await addSapphireWebAppConfigProperties(metaDataContents.envProperties);
+
+    // if BUILD_NUMBER & TEAMCITY_BUILDCONF_NAME not found then populate them using sapphireWebAppConfig
+    if (!metaDataContents.envProperties.BUILD_NUMBER) {
+      if (metaDataContents.envProperties[PR_CARE_ORCHESTRATOR_VERSION]) {
+        metaDataContents.envProperties.BUILD_NUMBER = metaDataContents.envProperties[PR_CARE_ORCHESTRATOR_VERSION];
+      }
+    }
+
+    if (!metaDataContents.envProperties.TEAMCITY_BUILDCONF_NAME) {
+      if (metaDataContents.envProperties.appName) {
+        metaDataContents.envProperties.TEAMCITY_BUILDCONF_NAME = metaDataContents.envProperties.appName;
+      } else {
+        metaDataContents.envProperties.TEAMCITY_BUILDCONF_NAME = 'Local Run by User ' + process.env.USER; 
+      }
+    }
+  }
 
   fs.writeFileSync(OUTDIR_FINAL + "/metadata.json", JSON.stringify(metaDataContents), function (err) {
     if (err) {
