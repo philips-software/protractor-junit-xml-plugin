@@ -101,12 +101,9 @@ let getJsonInXmlBuilderExpectedFormat = (inputFile) => {
 
 let findXrayIdAndName = (name, parseXrayId) => {
   let finalObj = {};
-  console.log('Coming in findXrayIdAndName');
   
   if (parseXrayId) {
     let tags = name.split(':', 4);
-    console.debug('before checking');
-    console.log('finalObj.xrayId: ' + tags[2]);
     
     if (tags[1].indexOf('XRAY-ID') > -1) {
       finalObj.xrayId = tags[2];
@@ -190,9 +187,6 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
     pluginConfig = this.config;
     console.warn('Plugin config not initialized so initializing it after test: ' + result.name);
   }
-  console.log('pluginConfig: ' + JSON.stringify(pluginConfig));
-  
-  console.log('parseXrayId: ' + pluginConfig.parseXrayId);
   
   let testInfo = findXrayIdAndName(result.name, pluginConfig.parseXrayId);
 

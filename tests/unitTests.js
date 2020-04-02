@@ -108,7 +108,6 @@ describe('In protractor-junit-xml-plugin', function () {
         return fakeFs;
     }
 
-
     it('if process.env has the following variables then it should add them in envProperties', async function () {
         const reqKeys = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME', 'USER', 'LANG', 'PWD'];
         const fakeFs = setupFakefs();
@@ -196,7 +195,6 @@ describe('In protractor-junit-xml-plugin', function () {
             });
 
             await protractorJunitXmlPlugin.teardown();
-
             const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
             const envProperties = metadata.envProperties;
             expect(envProperties).to.include.keys('TEAMCITY_BUILDCONF_NAME');
