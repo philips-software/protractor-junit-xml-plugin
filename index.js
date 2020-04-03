@@ -105,7 +105,7 @@ let findXrayIdAndName = (name, parseXrayId) => {
   if (parseXrayId) {
     let tags = name.split(':', 4);
     
-    if (tags[1].indexOf('XRAY-ID') > -1) {
+    if (tags.length > 1 && tags[1].indexOf('XRAY-ID') > -1) {
       finalObj.xrayId = tags[2];
       finalObj.name = tags[3].trim();
     } else {
