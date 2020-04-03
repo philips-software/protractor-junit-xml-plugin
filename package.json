@@ -1,6 +1,6 @@
 {
   "name": "protractor-junit-xml-plugin",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "A Protracotor plugin. Report results in junit xml format including requirement ids if available.",
   "main": "index.js",
   "files": [
