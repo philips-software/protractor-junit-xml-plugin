@@ -17,6 +17,15 @@ let protractorJunitXmlPlugin,
     noop = () => { };
 
 describe('In protractor-junit-xml-plugin', function () {
+    const fakeSuite = {
+        first: {
+            att: (input1, input2) => {
+                console.log('suite.att() called with input: ' + input1 + ', ' + input2);
+            },
+            ele: sinon.spy()
+        }
+    }
+
     protractorJunitXmlPlugin = rewire('../index.js');
     protractorJunitXmlPlugin.__set__({
         os: fakeOs,
@@ -33,19 +42,14 @@ describe('In protractor-junit-xml-plugin', function () {
     }
     protractorJunitXmlPlugin.__set__({
         currCapabilities: fakeCapabilities,
-        suites: {
-            first: {
-                att: (input1, input2) => {
-                    console.log('suite.att() called with input: ' + input1 + ', ' + input2);
-                }
-            }
-        },
+        suites: fakeSuite,
         xml: {
             end: () => '<fake-xml></fake-xml>'
         }
     });
 
     protractorJunitXmlPlugin.__set__('pluginConfig', {
+        parseXrayId: true,
         path: '../', //path for protractor plugin
         outdir: '_test-reports',
         filename: 'e2e-tests',
@@ -100,9 +104,10 @@ describe('In protractor-junit-xml-plugin', function () {
             writeFile: noop,
             writeFileSync: sinon.spy()
         };
-        protractorJunitXmlPlugin.__set__('fs', fakeFs); 
+        protractorJunitXmlPlugin.__set__('fs', fakeFs);
         return fakeFs;
     }
+
     it('if process.env has the following variables then it should add them in envProperties', async function () {
         const reqKeys = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME', 'USER', 'LANG', 'PWD'];
         const fakeFs = setupFakefs();
@@ -136,19 +141,48 @@ describe('In protractor-junit-xml-plugin', function () {
         revert();
     });
 
+    describe('parse XRAY ID tag format :XRAY-ID:[JIRA-ID]:', function() {
+        let requirementId;
+        const fakeResult = {
+            category: 'fake class'
+        }
+
+        it('when one JIRA-ID is given, it should be set in requirements', async function () {
+            requirementId = 'GLADOS-5565';
+            fakeResult.name = ':XRAY-ID:' + requirementId + ': this is a fake unit test',
+
+            await protractorJunitXmlPlugin.postTest(true, fakeResult);
+            const createdElement = fakeSuite.first.ele.firstCall.args[1];
+    
+            expect(createdElement.requirements).to.exist;
+            expect(createdElement.requirements).to.eq(requirementId);
+        });
+        
+        it('when multiple JIRA-IDs are given, all multiple ids should be set in requirements', async function () {
+            requirementId = 'GLADOS-397, GLADOS-5565, GLADOS-5566';
+            fakeResult.name = ':XRAY-ID:' + requirementId + ': this is a fake unit test',
+
+            await protractorJunitXmlPlugin.postTest(true, fakeResult);
+            const createdElement = fakeSuite.first.ele.secondCall.args[1];
+    
+            expect(createdElement.requirements).to.exist;
+            expect(createdElement.requirements).to.eq(requirementId);
+        });
+    });
+
     describe('if process.env do not have TEAMCITY_BUILDCONF_NAME and BUILD_NUMBER', function () {
-        it('and sapphireWebAppConfig has related info then it should try to populate it from sapphireWebAppConfig global', async function() {
+        it('and sapphireWebAppConfig has related info then it should try to populate it from sapphireWebAppConfig global', async function () {
             const reqKeys = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME'];
             const fakeFs = setupFakefs();
 
             await protractorJunitXmlPlugin.teardown();
-    
+
             const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
             const envProperties = metadata.envProperties;
-            expect(envProperties).to.include.keys(reqKeys); 
+            expect(envProperties).to.include.keys(reqKeys);
         });
 
-        it('and sapphireWebAppConfig is not available then it should use default values from Plugin and user info from process.env', async function() {
+        it('and sapphireWebAppConfig is not available then it should use default values from Plugin and user info from process.env', async function () {
             const fakeFs = setupFakefs();
 
             // setting up sapphireWebAppConfig null
@@ -161,13 +195,12 @@ describe('In protractor-junit-xml-plugin', function () {
             });
 
             await protractorJunitXmlPlugin.teardown();
-    
             const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
             const envProperties = metadata.envProperties;
-            expect(envProperties).to.include.keys('TEAMCITY_BUILDCONF_NAME'); 
+            expect(envProperties).to.include.keys('TEAMCITY_BUILDCONF_NAME');
         });
 
-        it('and sapphireWebAppConfig does not have that info then it should use default values from Plugin and user info from process.env', async function() {
+        it('and sapphireWebAppConfig does not have that info then it should use default values from Plugin and user info from process.env', async function () {
             const fakeFs = setupFakefs();
 
             // setting up sapphireWebAppConfig without appName
@@ -187,26 +220,29 @@ describe('In protractor-junit-xml-plugin', function () {
                     }
                 }
             });
-        
+
             await protractorJunitXmlPlugin.teardown();
-    
+
             const metadata = JSON.parse(fakeFs.writeFileSync.firstCall.args[1]);
             const envProperties = metadata.envProperties;
-            expect(envProperties).to.include.keys('TEAMCITY_BUILDCONF_NAME');  
+            expect(envProperties).to.include.keys('TEAMCITY_BUILDCONF_NAME');
         });
 
     })
 
     describe('if config captureSapphireWebAppContextVar is not set', function () {
-        protractorJunitXmlPlugin.__set__('pluginConfig', {
-            path: '../', //path for protractor plugin
-            outdir: '_test-reports',
-            filename: 'e2e-tests',
-            jiraProjectKey: 'CARE',
-            timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':', '_'),
-            uniqueName: true, //default true
-            uniqueFolder: true // default false
-        });
+
+        before(function () {
+            protractorJunitXmlPlugin.__set__('pluginConfig', {
+                path: '../', //path for protractor plugin
+                outdir: '_test-reports',
+                filename: 'e2e-tests',
+                jiraProjectKey: 'CARE',
+                timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':', '_'),
+                uniqueName: true, //default true
+                uniqueFolder: true // default false
+            });
+        })
 
         it('then it should not capture any sapphireWebAppConfig context fields in metadata', async function () {
             const fakeFs = setupFakefs();
@@ -247,17 +283,18 @@ describe('In protractor-junit-xml-plugin', function () {
 
     describe('if config captureSapphireWebAppContextVar is set to true', function () {
 
-        protractorJunitXmlPlugin.__set__('pluginConfig', {
-            path: '../', //path for protractor plugin
-            outdir: '_test-reports',
-            filename: 'e2e-tests',
-            jiraProjectKey: 'CARE',
-            timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':', '_'),
-            uniqueName: true, //default true
-            uniqueFolder: true, // default false
-            captureSapphireWebAppContextVar: true //default false 
-        });
-
+        before(function () {
+            protractorJunitXmlPlugin.__set__('pluginConfig', {
+                path: '../', //path for protractor plugin
+                outdir: '_test-reports',
+                filename: 'e2e-tests',
+                jiraProjectKey: 'CARE',
+                timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':', '_'),
+                uniqueName: true, //default true
+                uniqueFolder: true, // default false
+                captureSapphireWebAppContextVar: true //default false 
+            });
+        })
         it('then add available sapphireWebAppConfig context fields in metadata', async function () {
             const fakeFs = setupFakefs();
 
