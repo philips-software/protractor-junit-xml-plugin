@@ -59,7 +59,11 @@ After setting the plugin config in the protractor config file (usually named as 
 
 ## How to test the software
 
-This module includes a tests folder that contains a simple node test app and end to end(e2e) tests of the plugin. The e2e tests are in [protractor](https://www.protractortest.org/#/). To run the tests 
+**Unit Tests**
+Unit tests are in Mocha/Chai framework. After installing dependencies(`npm install`), one can run the unit tests by `mocha tests/unitTests.js`
+
+**End to end tests:**
+This module also has end to end(e2e) tests and a simple node test app in tests folder. When you run the e2e tests, the plugin that generates a XML output file though one need to manually verify the correct entries in the XML file. The e2e tests are in [protractor](https://www.protractortest.org/#/). To run the tests 
 1. Firstly, install all the dependencies by `npm install`.
 2. Install protractor as a global dependency `npm i -g protractor`
 3. Start the node test app `node tests/testapp/server.js` (tested on node v10).
