@@ -148,6 +148,8 @@ const addReqProcessEnvProp = (envProperties) => {
   reqKeys.forEach((key) => (envProperties[key] = process.env[key]));
 }
 JUnitXmlPlugin.prototype.onPrepare = async function () {
+  console.log('In OnPrepare: '+ protractor.resultDirName);
+
   if (browser) {
     currentBrowser = browser;
   }
@@ -161,9 +163,7 @@ JUnitXmlPlugin.prototype.onPrepare = async function () {
 
   //use uniqueName
   if (pluginConfig.uniqueName === false) {
-    outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
-  } else {
-    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
+    outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, false);
   }
   // console.log('OUTPUT FILE: ' +outputFile);
 
@@ -223,9 +223,11 @@ JUnitXmlPlugin.prototype.teardown = async function () {
 
   // resolving path and creating dir if it doesn't exist
   if (pluginConfig.uniqueName === false) {
-    outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
+    outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, false);
   } else {
-    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
+    console.log('Inside plugin: browser.timestampForDir: ' + browser.timestampForDir);
+
+    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolderPerRun, browser.timestampForDir);
   }
 
   let metaDataContents = {

@@ -35,17 +35,4 @@ describe('', () => {
         expect(await element(by.cssContainingText('h2','This is node test app for junit-xml-plugin')).isPresent()).toBeTruthy();
     });
 
-    it("testing unique Folder name created", function ()  {
-        browser.waitForAngularEnabled(false);
-        browser.get('http://localhost:3020/');
-        browser.sleep(5000);
-        fs.readdirSync('./_test-reports/').forEach(folder => {
-            console.log(folder)
-            expect(new Date().getFullYear()).toEqual(new Date().getFullYear());
-            expect(new Date().getDate()).toEqual(new Date().getDate());
-            expect(new Date().getHours()).toEqual(new Date().getHours());
-        });
-    });
-
-
 });
