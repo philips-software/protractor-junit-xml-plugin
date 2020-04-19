@@ -225,9 +225,10 @@ JUnitXmlPlugin.prototype.teardown = async function () {
   if (pluginConfig.uniqueName === false) {
     outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, false);
   } else {
-    console.log('Inside plugin: browser.timestampForDir: ' + browser.timestampForDir);
-
-    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolderPerExecution, browser.timestampForDir);
+    console.debug('Inside plugin: browser.timestampForDir: ' + browser.timestampForDir);
+    const uniqueNumber = (new Date()).getTime() + Math.floor((Math.random() * 1000) + 1);;
+    
+    outputFile = resolveCompleteFileName( uniqueNumber + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolderPerExecution, browser.timestampForDir);
   }
 
   let metaDataContents = {
