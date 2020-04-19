@@ -148,8 +148,6 @@ const addReqProcessEnvProp = (envProperties) => {
   reqKeys.forEach((key) => (envProperties[key] = process.env[key]));
 }
 JUnitXmlPlugin.prototype.onPrepare = async function () {
-  console.log('In OnPrepare: '+ protractor.resultDirName);
-
   if (browser) {
     currentBrowser = browser;
   }

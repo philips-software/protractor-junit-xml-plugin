@@ -1,16 +1,6 @@
 const { browser, by, element } = require('protractor');
 
 describe('', () => {
-    // beforeAll(() => {
-        // rimraf('./_test-reports/browser-based-results*', (err) => {
-        //     if(err) {
-        //         console.error('Deleting dir failed: ' + err);
-        //     } else {
-        //         console.log('Successfully deleted all the dir');
-        //     }
-        // })
-    // });
-
     it(':XRAY-1234: Passing test with xrayId', async () => {
         debugger;
         await browser.waitForAngularEnabled(false);

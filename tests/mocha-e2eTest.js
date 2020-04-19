@@ -34,18 +34,6 @@ describe('Running protractor e2e test', function () {
             console.log('In before: protractorProcess.status: ' + protractorProcess.status);
 
             console.log('results: \n' + protractorProcess.output.toString('utf8'));
-
-            // protractorProcess.stdout.on('data', (data) => {
-            //     console.log(`stdout: ${data}`);
-            // });
-
-            // protractorProcess.stderr.on('data', (data) => {
-            //     console.error(`stderr: ${data}`);
-            // });
-
-            // protractorProcess.on('close', (code) => {
-            //     console.log(`child process exited with code ${code}`);
-            // });
         }
 
         let deleteFolderRecursive = (targetDir) => {
@@ -79,7 +67,6 @@ describe('Running protractor e2e test', function () {
             deleteFolderRecursive(TARGET_DIR);
 
             runProtractorTests();
-            // console.log(`process.cwd(): ${process.cwd()} __dirname ${__dirname}`);
 
             const subDirCount = countSubDirs(TARGET_DIR);
 
