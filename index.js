@@ -156,7 +156,7 @@ JUnitXmlPlugin.prototype.onPrepare = async function () {
   if (!pluginConfig) {
     pluginConfig = this.config;
   }
-  if (pluginConfig.uniqueName && pluginConfig.appendToFile || pluginConfig.uniqueFolder && pluginConfig.appendToFile) {
+  if (pluginConfig.uniqueName && pluginConfig.appendToFile || pluginConfig.uniqueFolderPerExecution && pluginConfig.appendToFile) {
     throw new Error('You can not have a unique name or folder every time as well as appending results to the same file')
   }
   currCapabilities = await currentBrowser.getCapabilities();
@@ -227,7 +227,7 @@ JUnitXmlPlugin.prototype.teardown = async function () {
   } else {
     console.log('Inside plugin: browser.timestampForDir: ' + browser.timestampForDir);
 
-    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolderPerRun, browser.timestampForDir);
+    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolderPerExecution, browser.timestampForDir);
   }
 
   let metaDataContents = {

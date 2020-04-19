@@ -58,13 +58,13 @@ exports.config = {
     },
     beforeLaunch: () => {
         console.log('COMING BEFORE LAUNCH: ');
-        let newName = 'testDir-' + new Date().toISOString();
+        let currentTimestamp = (new Date()).toISOString().replace(/:/g,'_').replace('\.','');
         // this.config.resultDirName='testDir- ' + (new Date()).toISOString();
         // console.log('this: ' + JSON.stringify(this.config));
         // global.resultDirName = newName;
         // console.log('global.resultDirName: ' + global.resultDirName);
 
-        fs.writeFileSync('resultDirName.txt', newName, function(err) {
+        fs.writeFileSync('resultDirName.txt', currentTimestamp, function(err) {
             if (err) {
                 console.warn('Cannot write resultDirName.txt\n\t' + err.message);
             } else {
@@ -90,7 +90,6 @@ exports.config = {
             filename: 'e2e-tests',
             parseXrayId: true, //default false
             jiraProjectKey: 'CARE',
-            timeTillMinuteStamp: (new Date()).toISOString(),
             xrayIdOnly: false, //default false
             appendToFile: false, //default false
             uniqueName: true, //default true
