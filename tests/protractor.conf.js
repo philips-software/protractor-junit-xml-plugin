@@ -57,12 +57,8 @@ exports.config = {
         print: function() {}
     },
     beforeLaunch: () => {
-        console.log('COMING BEFORE LAUNCH: ');
         let currentTimestamp = (new Date()).toISOString().replace(/:/g,'_').replace('\.','');
-        // this.config.resultDirName='testDir- ' + (new Date()).toISOString();
         // console.log('this: ' + JSON.stringify(this.config));
-        // global.resultDirName = newName;
-        // console.log('global.resultDirName: ' + global.resultDirName);
 
         fs.writeFileSync('resultDirName.txt', currentTimestamp, function(err) {
             if (err) {
