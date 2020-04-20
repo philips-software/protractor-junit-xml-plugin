@@ -1,6 +1,5 @@
-let expect = require('chai').expect;
-
 'use strict'
+let expect = require('chai').expect;
 
 let sinon = require('sinon')
 

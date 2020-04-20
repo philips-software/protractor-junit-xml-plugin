@@ -1,4 +1,5 @@
 const { SpecReporter } = require('jasmine-spec-reporter');
+const fs = require('fs');
 
 exports.config = {
     // seleniumAddress: 'http://127.0.0.1:4444/wd/hub',
@@ -12,7 +13,8 @@ exports.config = {
 
     allScriptsTimeout: 110000,
     specs: [
-        './e2eTest.js'
+        './protractor-e2e/protractor-e2e-sameTest1.js',
+        './protractor-e2e/protractor-e2e-sameTest2.js'
     ],
     SELENIUM_PROMISE_MANAGER: false,
     capabilities: {
@@ -26,7 +28,9 @@ exports.config = {
                     prompt_for_download: false
                 }
             }
-        }
+        },
+        shardTestFiles: true,
+        maxInstances: 2
     },
     // multiCapabilities: [
     //     {
@@ -51,8 +55,28 @@ exports.config = {
         showColors: true,
         defaultTimeoutInterval: 120000,
         print: function() {}
-    }, 
-    OnPrepare() {
+    },
+    beforeLaunch: () => {
+        let currentTimestamp = (new Date()).toISOString().replace(/:/g,'_').replace('\.','');
+        // console.log('this: ' + JSON.stringify(this.config));
+
+        fs.writeFileSync('resultDirName.txt', currentTimestamp, function(err) {
+            if (err) {
+                console.warn('Cannot write resultDirName.txt\n\t' + err.message);
+            } else {
+                console.debug('name written to resultDirName.txt');
+            }
+        });
+    },
+
+    onPrepare: () => {
+        const resultDirName = fs.readFileSync('resultDirName.txt', 'utf8');
+        console.debug('resultDirName: ' + resultDirName);
+        if (resultDirName) {
+            browser.timestampForDir = resultDirName;
+        } else {
+            console.debug('resultDirName not found');
+        }
         jasmine.getEnv().addReporter,(new SpecReporter({ spec: { displayStacktrace: true } }));
     },
     plugins: [
@@ -62,11 +86,10 @@ exports.config = {
             filename: 'e2e-tests',
             parseXrayId: true, //default false
             jiraProjectKey: 'CARE',
-            timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':','_'),
             xrayIdOnly: false, //default false
             appendToFile: false, //default false
             uniqueName: true, //default true
-            uniqueFolder: true, // default false
+            uniqueFolderPerExecution: true, // default false
             captureSapphireWebAppContextVar: true //default false
         }
     ]

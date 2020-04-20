@@ -43,7 +43,7 @@ uniqueName: If set to true, it will generate a unique name for the filename. Def
 
 appendToFile: If set to true, it will append xml data to the bottom of the file instead of creating a new file or overwriting the file. This can not be true if uniqueName or uniqueFolder is set to true. Default is false
 
-uniqueFolder: If set to true, it will create a new directory for each time the test suite is run. 
+uniqueFolderPerExection: Default is false. If set to true, it will create a new directory for each time the test suite is run though it creates a one line(very small) file resultDirName.txt where it will store the directory name
 
 captureSapphireWebAppContextVar(Default is false): If set to true, it will look for a global object `sapphireWebAppConfig` in the app and capture the properties like appName, appVersion etc from it to a metadata file that this plugin will generate for each run(in addition to testresults xml file). The idea is to capture all the runtime info related to the test results.
 
@@ -59,14 +59,26 @@ After setting the plugin config in the protractor config file (usually named as 
 
 ## How to test the software
 
-**Unit Tests**
+### **Unit Tests**
 Unit tests are in Mocha/Chai framework. After installing dependencies(`npm install`), one can run the unit tests by `mocha tests/unitTests.js`
 
-**End to end tests:**
-This module also has end to end(e2e) tests and a simple node test app in tests folder. When you run the e2e tests, the plugin that generates a XML output file though one need to manually verify the correct entries in the XML file. The e2e tests are in [protractor](https://www.protractortest.org/#/). To run the tests 
-1. Firstly, install all the dependencies by `npm install`.
+### **End to end tests:**
+
+**mocha e2e test:**
+We have a Mocha e2e test that calls 2 protractor tests using a config file (`tests/protractor.conf.js`) and check the following test case 
+* If we run 2 tests in parallel and `uniqueFolderPerExection` option is set to true then results should be created in a single folder
+
+Here are the steps to run mocha test:
+ 1. Firstly, install all the dependencies if not done so far `npm install`
+ 2. `npm i -g mocha`
+ 3. `mocha tests/mocha-e2eTest.js`
+
+
+**protractor e2e tests**
+You can also run protractor e2e tests that uses this plugin to generates a XML output file and manually verify the correct entries in the XML file. The e2e tests are in [protractor](https://www.protractortest.org/#/). To run the tests 
+1. Firstly, install all the dependencies if not done so far `npm install`.
 2. Install protractor as a global dependency `npm i -g protractor`
-3. Start the node test app `node tests/testapp/server.js` (tested on node v10).
+3. Start the node test app `node tests/testapp/server.js` (tested on node v12).
 4. Run the tests `protractor tests/protractor.conf.js`
 
 ## Known issues

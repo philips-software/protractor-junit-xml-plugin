@@ -154,16 +154,14 @@ JUnitXmlPlugin.prototype.onPrepare = async function () {
   if (!pluginConfig) {
     pluginConfig = this.config;
   }
-  if (pluginConfig.uniqueName && pluginConfig.appendToFile || pluginConfig.uniqueFolder && pluginConfig.appendToFile) {
+  if (pluginConfig.uniqueName && pluginConfig.appendToFile || pluginConfig.uniqueFolderPerExecution && pluginConfig.appendToFile) {
     throw new Error('You can not have a unique name or folder every time as well as appending results to the same file')
   }
   currCapabilities = await currentBrowser.getCapabilities();
 
   //use uniqueName
   if (pluginConfig.uniqueName === false) {
-    outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
-  } else {
-    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
+    outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, false);
   }
   // console.log('OUTPUT FILE: ' +outputFile);
 
@@ -223,9 +221,12 @@ JUnitXmlPlugin.prototype.teardown = async function () {
 
   // resolving path and creating dir if it doesn't exist
   if (pluginConfig.uniqueName === false) {
-    outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
+    outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, false);
   } else {
-    outputFile = resolveCompleteFileName(Math.round((new Date()).getTime() / 1000) + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolder, pluginConfig.timeTillMinuteStamp);
+    console.debug('Inside plugin: browser.timestampForDir: ' + browser.timestampForDir);
+    const uniqueNumber = (new Date()).getTime() + Math.floor((Math.random() * 1000) + 1);;
+    
+    outputFile = resolveCompleteFileName( uniqueNumber + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolderPerExecution, browser.timestampForDir);
   }
 
   let metaDataContents = {
