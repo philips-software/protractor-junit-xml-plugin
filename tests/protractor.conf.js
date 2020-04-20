@@ -1,5 +1,6 @@
 const { SpecReporter } = require('jasmine-spec-reporter');
 const fs = require('fs');
+const tempTimestampForDirFile = 'resultDirName.txt';
 
 exports.config = {
     // seleniumAddress: 'http://127.0.0.1:4444/wd/hub',
@@ -60,7 +61,7 @@ exports.config = {
         let currentTimestamp = (new Date()).toISOString().replace(/:/g,'_').replace('\.','');
         // console.log('this: ' + JSON.stringify(this.config));
 
-        fs.writeFileSync('resultDirName.txt', currentTimestamp, function(err) {
+        fs.writeFileSync(tempTimestampForDirFile, currentTimestamp, function(err) {
             if (err) {
                 console.warn('Cannot write resultDirName.txt\n\t' + err.message);
             } else {
@@ -70,7 +71,7 @@ exports.config = {
     },
 
     onPrepare: () => {
-        const resultDirName = fs.readFileSync('resultDirName.txt', 'utf8');
+        const resultDirName = fs.readFileSync(tempTimestampForDirFile, 'utf8');
         console.debug('resultDirName: ' + resultDirName);
         if (resultDirName) {
             browser.timestampForDir = resultDirName;
@@ -86,8 +87,6 @@ exports.config = {
             filename: 'e2e-tests',
             parseXrayId: true, //default false
             jiraProjectKey: 'CARE',
-            xrayIdOnly: false, //default false
-            appendToFile: false, //default false
             uniqueName: true, //default true
             uniqueFolderPerExecution: true, // default false
             captureSapphireWebAppContextVar: true //default false
