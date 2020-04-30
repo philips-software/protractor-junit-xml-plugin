@@ -43,7 +43,9 @@ describe('In protractor-junit-xml-plugin', function () {
         currCapabilities: fakeCapabilities,
         suites: fakeSuite,
         xml: {
-            end: () => '<fake-xml></fake-xml>'
+            end: () => '<fake-xml><testsuites>' +
+            '<testsuite name="chrome 81.0.4044.122" timestamp="2020-04-22T20:16:58" id="0" hostname="Ms-MacBook-Pro" tests="2" failures="0">' + 
+            '<testcase name="fake testcase name" time="0" classname="fake classname"/></suite></fake-xml>'
         }
     });
 
@@ -140,7 +142,7 @@ describe('In protractor-junit-xml-plugin', function () {
         revert();
     });
 
-    describe('parse XRAY ID tag format :XRAY-ID:[JIRA-ID]:', function() {
+    describe('parse XRAY ID tag format :XRAY-ID:[JIRA-ID]:', function () {
         let requirementId;
         const fakeResult = {
             category: 'fake class'
@@ -150,20 +152,20 @@ describe('In protractor-junit-xml-plugin', function () {
             requirementId = 'GLADOS-5565';
             fakeResult.name = ':XRAY-ID:' + requirementId + ': this is a fake unit test',
 
-            await protractorJunitXmlPlugin.postTest(true, fakeResult);
+                await protractorJunitXmlPlugin.postTest(true, fakeResult);
             const createdElement = fakeSuite.first.ele.firstCall.args[1];
-    
+
             expect(createdElement.requirements).to.exist;
             expect(createdElement.requirements).to.eq(requirementId);
         });
-        
+
         it('when multiple JIRA-IDs are given, all multiple ids should be set in requirements', async function () {
             requirementId = 'GLADOS-397, GLADOS-5565, GLADOS-5566';
             fakeResult.name = ':XRAY-ID:' + requirementId + ': this is a fake unit test',
 
-            await protractorJunitXmlPlugin.postTest(true, fakeResult);
+                await protractorJunitXmlPlugin.postTest(true, fakeResult);
             const createdElement = fakeSuite.first.ele.secondCall.args[1];
-    
+
             expect(createdElement.requirements).to.exist;
             expect(createdElement.requirements).to.eq(requirementId);
         });
@@ -336,7 +338,7 @@ describe('In protractor-junit-xml-plugin', function () {
                 'TOGGLES_STATIC_TOGGLE_F2482_Business_Reports', 'TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY',
                 'gatewayUrl'
             ]);
-        })
+        });
         it('and sapphireWebAppConfig.packagedDeps and sapphireWebAppConfig.TOGGLES are not available then dont add those fields in metadata',
             async function () {
                 const fakeFs2 = setupFakefs();
@@ -373,6 +375,8 @@ describe('In protractor-junit-xml-plugin', function () {
                 ])
                 expect(envProperties).to.not.have.keys(['PR_CARE_ORCHESTRATOR_VERSION', 'TOGGLES_STATIC_TOGGLE_RWD',
                     'TOGGLES_STATIC_TOGGLE_F2482_Business_Reports', 'TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY']);
-            })
-    })
+            }
+        );
+
+    });
 });

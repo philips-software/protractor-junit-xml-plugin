@@ -217,6 +217,10 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
 };
 
 JUnitXmlPlugin.prototype.teardown = async function () {
+  debugger;
+  if(!currentBrowser) {
+    currentBrowser = browser;
+  }
   if (!pluginConfig) {
     pluginConfig = this.config;
   }
@@ -238,10 +242,10 @@ JUnitXmlPlugin.prototype.teardown = async function () {
   if (pluginConfig.uniqueName === false) {
     outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, false);
   } else {
-    console.debug('Inside plugin: browser.timestampForDir: ' + browser.timestampForDir);
+    console.debug('Inside plugin: browser.timestampForDir: ' + currentBrowser.timestampForDir);
     const uniqueNumber = (new Date()).getTime() + Math.floor((Math.random() * 1000) + 1);;
     
-    outputFile = resolveCompleteFileName( uniqueNumber + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolderPerExecution, browser.timestampForDir);
+    outputFile = resolveCompleteFileName( uniqueNumber + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolderPerExecution, currentBrowser.timestampForDir);
   }
 
   // Fix if dir already exist before uncommenting below line
