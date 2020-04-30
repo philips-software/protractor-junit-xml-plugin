@@ -228,8 +228,7 @@ describe('In protractor-junit-xml-plugin', function () {
             const envProperties = metadata.envProperties;
             expect(envProperties).to.include.keys('TEAMCITY_BUILDCONF_NAME');
         });
-
-    })
+    });
 
     describe('if config captureSapphireWebAppContextVar is not set', function () {
 
@@ -279,7 +278,7 @@ describe('In protractor-junit-xml-plugin', function () {
                 'TOGGLES_STATIC_TOGGLE_F2482_Business_Reports', 'TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY',
                 'gatewayUrl'
             ]);
-        })
+        });
     });
 
     describe('if config captureSapphireWebAppContextVar is set to true', function () {
@@ -377,6 +376,5 @@ describe('In protractor-junit-xml-plugin', function () {
                     'TOGGLES_STATIC_TOGGLE_F2482_Business_Reports', 'TOGGLES_STATIC_ENABLE_SAPPHIRE_GATEWAY']);
             }
         );
-
     });
 });
