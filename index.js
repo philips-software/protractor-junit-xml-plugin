@@ -119,6 +119,7 @@ let findXrayIdAndName = (name, parseXrayId) => {
   return finalObj;
 }
 const addSapphireWebAppConfigProperties = async (envProperties) => {
+  try {
   let sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig');
 
   // if sapphireWebAppConfig global var not present then quit
@@ -140,6 +141,9 @@ const addSapphireWebAppConfigProperties = async (envProperties) => {
   const TOGGLE_PREFIX = 'TOGGLES_'
   for (let toggle in sapphireWebAppConfig[TOGGLES_KEY]) {
     envProperties[TOGGLE_PREFIX + toggle] = sapphireWebAppConfig.TOGGLES[toggle];
+  }
+  } catch (err) {
+    console.error('sapphireWebAppConfig not found. Here is the err: ' + err);
   }
 }
 
@@ -213,21 +217,46 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
 };
 
 JUnitXmlPlugin.prototype.teardown = async function () {
+  debugger;
+  if(!currentBrowser) {
+    currentBrowser = browser;
+  }
   if (!pluginConfig) {
     pluginConfig = this.config;
   }
 
   let suite = suites[await getBrowserId()];
 
+  suite.att('tests', testCount);
+  suite.att('failures', failCount);
+  const finalXml = xml.end({ pretty: true });
+  // console.log('xml object:\n' + JSON.stringify(xml));
+
+  // console.log('finalXml: \n' + finalXml);
+  if (finalXml.indexOf('testcase') < 0) {
+    console.log('No testcase recorded so no need to write the result xml file');
+    return 0;
+  }
+
   // resolving path and creating dir if it doesn't exist
   if (pluginConfig.uniqueName === false) {
     outputFile = resolveCompleteFileName(pluginConfig.fileName, pluginConfig.outdir, false);
   } else {
-    console.debug('Inside plugin: browser.timestampForDir: ' + browser.timestampForDir);
+    console.debug('Inside plugin: browser.timestampForDir: ' + currentBrowser.timestampForDir);
     const uniqueNumber = (new Date()).getTime() + Math.floor((Math.random() * 1000) + 1);;
     
-    outputFile = resolveCompleteFileName( uniqueNumber + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolderPerExecution, browser.timestampForDir);
+    outputFile = resolveCompleteFileName( uniqueNumber + '.xml', pluginConfig.outdir, pluginConfig.uniqueFolderPerExecution, currentBrowser.timestampForDir);
   }
+
+  // Fix if dir already exist before uncommenting below line
+  fs.writeFile(outputFile, finalXml, function (err) {
+    if (err) {
+      console.warn('Cannot write JUnit xml\n\t' + err.message);
+    } else {
+      console.debug('JUnit results written to "%s".', outputFile);
+    }
+  });
+
 
   let metaDataContents = {
     jiraProjectKey: pluginConfig.jiraProjectKey,
