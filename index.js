@@ -28,6 +28,7 @@ let getBrowserId = async () => {
 
 let initliazeXmlForBrowser = async function () {
   let timestamp = (new Date()).toISOString().substr(0, 19);
+  console.info('Curr Capabilities: ' + JSON.stringify(currCapabilities));
   let name = currCapabilities.get('browserName') + ' ' + currCapabilities.get('browserVersion');
   suites[await getBrowserId()] = xml.ele('testsuite', {
     name: name, timestamp: timestamp, id: 0, hostname: os.hostname()
