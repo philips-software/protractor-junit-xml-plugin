@@ -225,7 +225,6 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
 };
 
 JUnitXmlPlugin.prototype.teardown = async function () {
-  debugger;
   if(!currentBrowser) {
     currentBrowser = browser;
   }
