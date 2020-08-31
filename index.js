@@ -28,9 +28,17 @@ let getBrowserId = async () => {
 
 let initliazeXmlForBrowser = async function () {
   let timestamp = (new Date()).toISOString().substr(0, 19);
+  // console.info('Curr Capabilities: ' + JSON.stringify(currCapabilities));
   let name = currCapabilities.get('browserName') + ' ' + currCapabilities.get('browserVersion');
+  let browserPlatform = currCapabilities.get('platformName');
+  let browserPlatformVersion = currCapabilities.get('platformVersion');
+
   suites[await getBrowserId()] = xml.ele('testsuite', {
-    name: name, timestamp: timestamp, id: 0, hostname: os.hostname()
+    browser: name,
+    browserPlatform: browserPlatform,
+    browserPlatformVersion: browserPlatformVersion, 
+    hostname: os.hostname(),
+    timestamp: timestamp, 
   });
 };
 
@@ -217,7 +225,6 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
 };
 
 JUnitXmlPlugin.prototype.teardown = async function () {
-  debugger;
   if(!currentBrowser) {
     currentBrowser = browser;
   }
