@@ -105,27 +105,55 @@ let getJsonInXmlBuilderExpectedFormat = (inputFile) => {
   });
 
   return convertedObj;
-}
+};
 
-let findXrayIdAndName = (name, parseXrayId) => {
-  let finalObj = {};
-  
-  if (parseXrayId) {
-    let tags = name.split(':', 4);
-    
-    if (tags.length > 1 && tags[1].indexOf('XRAY-ID') > -1) {
-      finalObj.xrayId = tags[2];
-      finalObj.name = tags[3].trim();
-    } else {
-      // No xrayId found so just capturing name
-      finalObj.name = name;
+let positionOfDelimiters = (name, delim) => {
+  let positions = [];
+
+  let n = name.length;
+  for (let at = 0; at < n;) {
+    let col = name.indexOf(delim, at);
+
+    if (col < 0) {
+      break;
     }
-  } else {
-    finalObj.name = name;
+
+    positions.push(col);
+
+    at = col + 1;
   }
 
-  return finalObj;
-}
+  return positions;
+};
+
+let findXrayIdAndName = (name, parseXrayId) => {
+  let inNameOnly = {};
+  inNameOnly.name = name;
+
+  if (!parseXrayId) {
+    return inNameOnly;
+  }
+
+  // Example: [ 0, 8, 20]
+  let dPos = positionOfDelimiters(name, ':');
+  if (dPos.length < 3) {
+    return inNameOnly;
+  }
+
+  // ID tag is missing?
+  let marker = name.substring(dPos[0] + 1, dPos[1]);
+  if (marker.indexOf('XRAY-ID') < 0) {
+    return inNameOnly;
+  }
+
+  let result = {};
+
+  result.xrayId = name.substring(dPos[1] + 1, dPos[2]).trim();
+  result.name = name.substring(dPos[2] + 1).trim();
+
+  return result;
+};
+
 const addSapphireWebAppConfigProperties = async (envProperties) => {
   try {
   let sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig');
@@ -159,6 +187,7 @@ const addReqProcessEnvProp = (envProperties) => {
   const reqKeys = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME', 'USER', 'LANG', 'PWD'];
   reqKeys.forEach((key) => (envProperties[key] = process.env[key]));
 }
+
 JUnitXmlPlugin.prototype.onPrepare = async function () {
   if (browser) {
     currentBrowser = browser;
@@ -316,3 +345,4 @@ JUnitXmlPlugin.prototype.teardown = async function () {
 
 module.exports = new JUnitXmlPlugin();
 module.exports.JUnitXrayPlugin = JUnitXmlPlugin;
+module.exports.findXrayIdAndName = findXrayIdAndName;
