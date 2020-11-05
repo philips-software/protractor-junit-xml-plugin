@@ -14,9 +14,10 @@
     "junit",
     "protractor-plugin"
   ],
-  "author": "Arsalan Siddiqui <robotics1@gmail.com>",
+  "author": "Arsalan Siddiqui <arsalan.siddiqui@philips.com>",
   "contributors": [
-    "Stephanie Gawroriski <stephanie.gawroriski@gmail.com>"
+    "Stephanie Gawroriski <stephanie.gawroriski@gmail.com>",
+    "Marcus Beacon <marcus.beacon@philips.com>"
   ],
   "dependencies": {
     "protractor": "^5.4.2",

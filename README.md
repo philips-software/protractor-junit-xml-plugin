@@ -89,7 +89,7 @@ We are actively using this plugin for our protractor e2e tests and have not seen
 
 You can contact any of us if you run into any issues 
 - Arsalan Siddiqui <<Arsalan.Siddiqui@philips.com>>
-- Marcus Beacon <<Marcus.Beacon@philips.com>>
+- Stephanie Gawroriski <<stephanie.gawroriski@philips.com>>
 
 ## License
 
