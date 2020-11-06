@@ -5,6 +5,8 @@ const os = require('os'),
   builder = require('xmlbuilder'),
   parseStringSync = require('xml2js-parser').parseStringSync;
 
+let common = require('./common.js');
+
 let JUNITXMLPLUGIN = 'JUnitXrayPlugin: ',
   OUTDIR_FINAL,
   PR_CARE_ORCHESTRATOR_VERSION = 'PR_CARE_ORCHESTRATOR_VERSION',
@@ -107,53 +109,6 @@ let getJsonInXmlBuilderExpectedFormat = (inputFile) => {
   return convertedObj;
 };
 
-let positionOfDelimiters = (name, delim) => {
-  let positions = [];
-
-  let n = name.length;
-  for (let at = 0; at < n;) {
-    let col = name.indexOf(delim, at);
-
-    if (col < 0) {
-      break;
-    }
-
-    positions.push(col);
-
-    at = col + 1;
-  }
-
-  return positions;
-};
-
-let findXrayIdAndName = (name, parseXrayId) => {
-  let inNameOnly = {};
-  inNameOnly.name = name;
-
-  if (!parseXrayId) {
-    return inNameOnly;
-  }
-
-  // Example: [ 0, 8, 20]
-  let dPos = positionOfDelimiters(name, ':');
-  if (dPos.length < 3) {
-    return inNameOnly;
-  }
-
-  // ID tag is missing?
-  let marker = name.substring(dPos[0] + 1, dPos[1]);
-  if (marker.indexOf('XRAY-ID') < 0) {
-    return inNameOnly;
-  }
-
-  let result = {};
-
-  result.xrayId = name.substring(dPos[1] + 1, dPos[2]).trim();
-  result.name = name.substring(dPos[2] + 1).trim();
-
-  return result;
-};
-
 const addSapphireWebAppConfigProperties = async (envProperties) => {
   try {
   let sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig');
@@ -227,7 +182,7 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
     console.warn('Plugin config not initialized so initializing it after test: ' + result.name);
   }
   
-  let testInfo = findXrayIdAndName(result.name, pluginConfig.parseXrayId);
+  let testInfo = common.findXrayIdAndName(result.name, pluginConfig.parseXrayId);
 
   if (pluginConfig.xrayIdOnlyTests) {
     if (!testInfo.xrayId) return;
@@ -345,4 +300,3 @@ JUnitXmlPlugin.prototype.teardown = async function () {
 
 module.exports = new JUnitXmlPlugin();
 module.exports.JUnitXrayPlugin = JUnitXmlPlugin;
-module.exports.findXrayIdAndName = findXrayIdAndName;

@@ -4,7 +4,8 @@
   "description": "A Protractor plugin. Report results in junit xml format including requirement ids if available.",
   "main": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "common.js"
   ],
   "repository": {
     "type": "git",
