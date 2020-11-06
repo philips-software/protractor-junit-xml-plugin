@@ -1,10 +1,12 @@
-'use strict'
+'use strict';
 let expect = require('chai').expect;
 
-let sinon = require('sinon')
+let sinon = require('sinon');
 
 // var proxyquire = require('proxyquire');
 let rewire = require('rewire');
+
+let common = require('../common.js');
 
 let protractorJunitXmlPlugin,
     fakeBuilder = {},
@@ -142,11 +144,20 @@ describe('In protractor-junit-xml-plugin', function () {
         revert();
     });
 
+    describe('When XRAY-ID tag has delimiters in name field:', function () {
+        it('The name is not truncated', async function () {
+            let splice = await common.findXrayIdAndName(':XRAY-ID:GLADOS-5566:Name with a colon : in it', true);
+
+            expect(splice.xrayId).to.eq('GLADOS-5566');
+            expect(splice.name).to.eq('Name with a colon : in it');
+        });
+    });
+
     describe('parse XRAY ID tag format :XRAY-ID:[JIRA-ID]:', function () {
         let requirementId;
         const fakeResult = {
             category: 'fake class'
-        }
+        };
 
         it('when one JIRA-ID is given, it should be set in requirements', async function () {
             requirementId = 'GLADOS-5565';
@@ -292,9 +303,10 @@ describe('In protractor-junit-xml-plugin', function () {
                 timeTillMinuteStamp: (new Date()).toISOString().substr(0, 16).replace(':', '_'),
                 uniqueName: true, //default true
                 uniqueFolder: true, // default false
-                captureSapphireWebAppContextVar: true //default false 
+                captureSapphireWebAppContextVar: true //default false
             });
-        })
+        });
+
         it('then add available sapphireWebAppConfig context fields in metadata', async function () {
             const fakeFs = setupFakefs();
 
@@ -338,6 +350,7 @@ describe('In protractor-junit-xml-plugin', function () {
                 'gatewayUrl'
             ]);
         });
+
         it('and sapphireWebAppConfig.packagedDeps and sapphireWebAppConfig.TOGGLES are not available then dont add those fields in metadata',
             async function () {
                 const fakeFs2 = setupFakefs();

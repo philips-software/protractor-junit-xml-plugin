@@ -5,6 +5,8 @@ const os = require('os'),
   builder = require('xmlbuilder'),
   parseStringSync = require('xml2js-parser').parseStringSync;
 
+let common = require('./common.js');
+
 let JUNITXMLPLUGIN = 'JUnitXrayPlugin: ',
   OUTDIR_FINAL,
   PR_CARE_ORCHESTRATOR_VERSION = 'PR_CARE_ORCHESTRATOR_VERSION',
@@ -105,27 +107,8 @@ let getJsonInXmlBuilderExpectedFormat = (inputFile) => {
   });
 
   return convertedObj;
-}
+};
 
-let findXrayIdAndName = (name, parseXrayId) => {
-  let finalObj = {};
-  
-  if (parseXrayId) {
-    let tags = name.split(':', 4);
-    
-    if (tags.length > 1 && tags[1].indexOf('XRAY-ID') > -1) {
-      finalObj.xrayId = tags[2];
-      finalObj.name = tags[3].trim();
-    } else {
-      // No xrayId found so just capturing name
-      finalObj.name = name;
-    }
-  } else {
-    finalObj.name = name;
-  }
-
-  return finalObj;
-}
 const addSapphireWebAppConfigProperties = async (envProperties) => {
   try {
   let sapphireWebAppConfig = await currentBrowser.executeScript('return sapphireWebAppConfig');
@@ -159,6 +142,7 @@ const addReqProcessEnvProp = (envProperties) => {
   const reqKeys = ['BUILD_NUMBER', 'TEAMCITY_BUILDCONF_NAME', 'USER', 'LANG', 'PWD'];
   reqKeys.forEach((key) => (envProperties[key] = process.env[key]));
 }
+
 JUnitXmlPlugin.prototype.onPrepare = async function () {
   if (browser) {
     currentBrowser = browser;
@@ -198,7 +182,7 @@ JUnitXmlPlugin.prototype.postTest = async function (passed, result) {
     console.warn('Plugin config not initialized so initializing it after test: ' + result.name);
   }
   
-  let testInfo = findXrayIdAndName(result.name, pluginConfig.parseXrayId);
+  let testInfo = common.findXrayIdAndName(result.name, pluginConfig.parseXrayId);
 
   if (pluginConfig.xrayIdOnlyTests) {
     if (!testInfo.xrayId) return;
