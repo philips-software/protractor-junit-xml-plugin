@@ -26,28 +26,25 @@ npm update protractor-junit-xml-plugin
 
 ## Configuration
 
-For an example of a protractor config file for this plugin, please see plugin section of [protractor.conf.js](tests/protractor.conf.js) located in the tests folder of this plugin
+For an example of a protractor config file for this plugin, please see plugin section of [protractor.conf.js](tests/protractor.conf.js) located in the tests folder of this plugin.
 
-The following are the configurable options
-```   
-outdir: output directory of the test results, if not specified it defaults the directory name to "_test-reports"
+These are the configurable options:
 
-filename: the filename starting of output result file, if not specified it defaults the file name to "test-results.xml" 
+* `outdir` (default: `"_test-reports"`) - output directory of the test results.
 
-parseXrayId: If set to true it will try to extract Xray Jira id from the test name and put it in the attribute "requirement" in testcase result xml. The id should be in between two colons e.g ":XRAY-1234: test to check report graphs". The result testcase element would be like <testcase name="Failing test with xrayId" ... requirements="XRAY-1234">. This is helpful if this tet is attached to a jira requirement and you want to report back the result(Continuous Integration). 
-if not specified it defaults to "false"
+* `filename` (default: `"test-results.xml"`) - the filename starting of output result file. 
 
-xrayIdOnlyTests: If set to true, it will only consider the tests that have Xray Jira Id in their name. If not specified it defaults to "false"
+* `parseXrayId` (default: `false`) - If set to true it will try to extract Xray Jira id from the test name and put it in the attribute "requirement" in testcase result xml. The id should be in between two colons e.g ":XRAY-1234: test to check report graphs". The result testcase element would be like <testcase name="Failing test with xrayId" ... requirements="XRAY-1234">. This is helpful if this tet is attached to a jira requirement and you want to report back the result (Continuous Integration).
 
-uniqueName: If set to true, it will generate a unique name for the filename. Default is true. This can not be true if appendToFile is also true.
+* `xrayIdOnlyTests` (default: `false`) - If set to true, it will only consider the tests that have Xray Jira Id in their name.
 
-appendToFile: If set to true, it will append xml data to the bottom of the file instead of creating a new file or overwriting the file. This can not be true if uniqueName or uniqueFolder is set to true. Default is false
+* `uniqueName` (default: `false`) - If set to true, it will generate a unique name for the filename. This cannot be true if `appendToFile` is also true.
 
-uniqueFolderPerExection: Default is false. If set to true, it will create a new directory for each time the test suite is run though it creates a one line(very small) file resultDirName.txt where it will store the directory name
+* `appendToFile` (default: `false`) - If set to true, it will append xml data to the bottom of the file instead of creating a new file or overwriting the file. This can not be true if uniqueName or uniqueFolder is set to true.
 
-captureSapphireWebAppContextVar(Default is false): If set to true, it will look for a global object `sapphireWebAppConfig` in the app and capture the properties like appName, appVersion etc from it to a metadata file that this plugin will generate for each run(in addition to testresults xml file). The idea is to capture all the runtime info related to the test results.
+* `uniqueFolderPerExection` (default: `false`) - If set to true, it will create a new directory for each time the test suite is run though it creates a one line(very small) file resultDirName.txt where it will store the directory name
 
-```
+* `captureSapphireWebAppContextVar` (default: `false`) - If set to true, it will look for a global object `sapphireWebAppConfig` in the app and capture the properties like appName, appVersion etc from it to a metadata file that this plugin will generate for each run(in addition to testresults xml file). The idea is to capture all the runtime info related to the test results.
 
 ## Usage
 
