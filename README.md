@@ -1,6 +1,8 @@
 # protractor-junit-xml-plugin
 [![NPM](https://img.shields.io/npm/v/protractor-junit-xml-plugin.svg)](https://www.npmjs.com/package/protractor-junit-xml-plugin)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://scm.sapphirepri.com/arsalan.siddiqui/protractor-junit-xml-plugin.git)
+
+**Copyright**: Copyright © 2019 Koninklijke Philips N.V
  
 **Description**: This plugin is a protractor reporter plugin that reports the test results in JUnit XML file so if you are looking for a plugin to export JUnit XML results you are at the right place. 
 This plugin also has an additional option to parse and extract Xray Id (A JIRA plugin to identify requirements) from a test name and put it in a separate attribute in the output exported XML. This can help in exporting test results with xrayId and link the test to a requirement in Xray Jira (Continuous Integration). It also has an option to just use tests with an xrayId and ignore the tests that don't have an XrayId. By default these additional options are turned off. Please see the configuration section for the option details
@@ -81,12 +83,6 @@ You can also run protractor e2e tests that uses this plugin to generates a XML o
 ## Known issues
 
 We are actively using this plugin for our protractor e2e tests and have not seen any issues so for. Please contact us if you run into any issues.
-
-## Contact / Getting help
-
-You can contact any of us if you run into any issues 
-- Arsalan Siddiqui <<Arsalan.Siddiqui@philips.com>>
-- Stephanie Gawroriski <<stephanie.gawroriski@philips.com>>
 
 ## License
 
